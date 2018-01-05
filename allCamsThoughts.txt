@@ -1,0 +1,21 @@
+-Optimize for 5 total settlements (with lowest road cost, 5 total roads)
+	-switch and optimize for city if:
+		-You have 5 settlements
+		-your odds to be able to build a city by the time it's your turn(based on projected resources and current resources) is x% more likely than settlement, AND you have at least two settlements`
+-You can KNOW at any point your odds of getting each resource (where to track this?)
+-Would need data but I'm sure there's a "If no one has biggest road or road of X length by round Y, sprint for biggest road (at end)?
+	-it may be adventageous to get it in the beginning to force other players to burn resources to get it?
+
+Turn Order:
+1. Try to build
+2. try to trade
+3. try to build
+^^Only build what you're trying to optimize for
+4. if at or over 7 cards, build or trade anything to get you to 7 or under
+	-even development cards
+	-Look into this, maybe it's actually statistically better to take the risk and hold
+
+-Dont always escalate trade to 2:1 or 3:1 even if it's adventageous so p opponents don't anticipate it and always deny your first trade
+
+Social Engineering:
+-If someone tried to rob you, you can figure out what they need and throw someone else under the bus. ("You're robbing me? Mark has the most clay")

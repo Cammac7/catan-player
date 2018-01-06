@@ -42,6 +42,9 @@ class catanBoard:
                 if loc not in self.nodelist:
                     self.addNode(loc)
                 self.nodelist[loc].returns[item[1]] = item[0]
+                for adj in [(loc[0]+1,loc[1]-1),(loc[0],loc[1]-2),(loc[0]-1,loc[1]-1),(loc[0]-1,loc[1]+1),(loc[0],loc[1]+2),(loc[0]+1,loc[1]+1)]:
+                    if adj in self.nodelist:
+                        self.nodelist[loc].neighbors[self.nodelist[adj]] = None #assign adjacent neighbors
 
 
 #tileList given left->right top->bottom
@@ -49,4 +52,5 @@ tileList = [('ore', 10), ('wool', 2), ('lumber', 9), ('grain', 12), ('brick', 6)
 myboard = catanBoard()
 myboard.setTerrain(tileList)
 for node in myboard.nodelist.values():
-    print(node.returns)
+    nears = [nb.returns for nb in node.neighbors.keys()]
+    print("Node is: {}. Node neighb is: {}".format(node.returns, nears))

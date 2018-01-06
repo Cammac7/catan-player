@@ -15,6 +15,13 @@ class player:
         self.edges = [] #do we need this?
         self.victoryPoints = 0 #can contain decimals to represent probability
 
+    def diceroll(self):
+        die1 = random.randint(1,6)
+        die2 = random.randint(1,6)
+        print(die1+die2)
+        return die1+die2
+
+
 class catanBoard:
     def __init__(self):
         self.nodelist = {} #location:node. 54 total nodes
@@ -45,6 +52,12 @@ class catanBoard:
                 for adj in [(loc[0]+1,loc[1]-1),(loc[0],loc[1]-2),(loc[0]-1,loc[1]-1),(loc[0]-1,loc[1]+1),(loc[0],loc[1]+2),(loc[0]+1,loc[1]+1)]:
                     if adj in self.nodelist:
                         self.nodelist[loc].neighbors[self.nodelist[adj]] = None #assign adjacent neighbors
+
+class playCatan:
+    #dynamic init to take list of opponent colors
+    def __init__(self,....,ownColor
+
+
 
 
 #tileList given left->right top->bottom

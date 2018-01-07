@@ -1,3 +1,18 @@
+class Card:
+    def __init__(self, ctype):
+        self.name = ctype
+
+    def play(self):
+        raise Exception("Not Implemented")
+
+class Monopoly(Card):
+    def __init__(self):
+        Card.__init__(self, "Monopoly")
+
+    def play(self):
+
+
+
 class Node:
     def __init__(self):
         self.owner = None #color, or none
@@ -8,7 +23,7 @@ class Node:
 
 class Player:
     def __init__(self, color):
-        self.hand = set() #resouce cards
+        self.hand = {} #resouce cards
         self.cards = [] #development cards
         self.color = color #player color
         self.nodes = {} #(x,y):node
@@ -49,6 +64,7 @@ class CatanBoard:
         self.nodelist[location] = Node()
 
     def buildSettle(self,color,location):
+        #this needs to use resources
         selecNode = self.nodelist[location]
         selecNode.owner = color
         selecNode.structure = 1
@@ -59,7 +75,7 @@ class CatanBoard:
     def buildCity(self, location):
         selecNode = self.nodelist[location]
         selecNode.structure = 2
-        self.players[selecNode.owner].victoryPoints += 1
+        self.players[selecNode.owner].updateVPs()
 
     def buildRoad(self, color, fromLoc, toLoc):
         fromNode = nodelist[fromLoc]

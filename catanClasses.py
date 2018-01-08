@@ -5,7 +5,23 @@ class Card(Enum):
     YEAR_OF_PLENTY = 4
     MONOPOLY = 5
 
-class Node:
+class Resource(Enum):
+    ORE = 1
+    BRICK = 2
+    GRAIN = 3 
+    LUMBER = 4
+    WOOL = 5
+
+class PlayerColors(Enum):#ok player colors should be enums too. Everything is string rn, need to update🙄
+    RED  = 1
+    BLUE = 2
+    ORANGE = 3
+    WHITE = 4
+    BLACK = 5
+    GREEN = 6
+    BANK = 7
+
+class Node: 
     def __init__(self):
         self.owner = None #color, or none
         self.structure = 0#0, 1 for settlement,2 for city none
@@ -19,8 +35,6 @@ class Player:
         self.hand = Counter() #resouce cards (initialized to 4brick, 4wood,2wool, 2 grain)
         self.cards = [] #development cards
         self.color = color #player color
-        #self.nodes = {} #(x,y):node
-        #self.edges = [] #do we need this?
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
         self.remaining = {} #remaining roads, settlements and cities
         self.longestRoad = false
@@ -49,13 +63,9 @@ class Human(Player):
 class Computer(Player):
     def __init__(self, color):
         Player.__init__(self, color)
-# don't need dice roll, use board dice
-#    def diceroll(self):
-#        die1 = random.randint(1,6)
-#        die2 = random.randint(1,6)
-#        print(die1+die2)
-#        return die1+die2
 
+    def playTurn():#need to implement
+        return True
 
 class CatanBoard:
     def __init__(self):
@@ -63,6 +73,7 @@ class CatanBoard:
         self.edgelist = {} #edgename:color ?? or color:[(locA,locB)]
         self.players = {} #color:player
         self.deck = [] #stack of dev cards
+        self.winner = False
 
     def play():
     #Setup
@@ -74,19 +85,35 @@ class CatanBoard:
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Player(compColor)
         self.initialPlacement()
-
+        function_mappings = {
+                'initial placement': initalPlacement(),
+                'build settlement': userBuildSettle(),
+                'build city': userBuildCity(),
+                'build road': userBuildRoad(),
+                'build dev card': userBuildDev(),
+                'make trade': None,
+                'monopoly' : None,
+                'year of plenty' : None,
+                'knight': None,
+                'road building': None
+                'roll' : userRoll(diceTotal) #not yet implemented. Gonna want to parse string and pass val like "roll 10"
+                'play turn': None
+                }
+        while winner == False:
+           winner = True #this is where we'll run the game 
+           #take input, map it to a function using the above
+           #when computer's turn, call play turn, execute computer turn
 
     def initialPlacement():
-        for i in range(2):
-            toPlace = set(self.players.keys())
-            while len(toPlace) > 0:
-                pColor = input("Who is placing?")
-                setLoc = input("Location of Placed Settlement: ")
-                setRd = input("Location of road end: ")
-                self.buildSettle(pColor,setLoc)
-                self.buildRoad(pColor,setLoc,setRd)
-                toPlace.remove(pColor)
-
+        pColor = input("Who is placing?")
+        setLoc = input("Location of Placed Settlement: ")
+        setRd = input("Location of road end: ")
+        #If color == computer then run our initial placement function
+        self.buildSettle(pColor,setLoc)
+        self.buildRoad(pColor,setLoc,setRd)
+    
+    def hello():
+        print("Hellloooo!!")
 
     def buildTileList():
         tList = []
@@ -105,13 +132,21 @@ class CatanBoard:
     def addPlayers(colorList):
         for color in colorList:
             self.players[color] = Player(color)
-
+    
+    def userAddPort():
+        location = input("What's the location of the node?")
+        portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
+        self.addPort(location,portType)
     def addPort(self,location,portType):
         self.nodelist[location].port = portType
 
     def addNode(self,location):
         self.nodelist[location] = Node()
 
+    def userBuildSettle():
+        color = input("Which color player?")
+        loc = input("What location? (x,y)")
+        self.buildSettle(color, loc)
     def buildSettle(self,color,location):
         #this needs to use resources
         selecNode = self.nodelist[location]
@@ -120,17 +155,27 @@ class CatanBoard:
         player = self.players[color]
         player.victoryPoints += 1 #this is faster than running the function
 
+    def userBuildCity():
+        loc = input("What location? (x,y)")
+        self.buildCity(loc)
     def buildCity(self, location):
         selecNode = self.nodelist[location]
         selecNode.structure = 2
         self.players[selecNode.owner].updateVPs()
 
+    def userBuildRoad():
+        color = input("Which color player?")
+        fromL = input("From which location? (x,y)")
+        toL = input("To which location? (x,y)")
+        self.buildRoad(color,fromL,toL)
     def buildRoad(self, color, fromLoc, toLoc):
         fromNode = nodelist[fromLoc]
         toNode = nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
 
+    def userBuildDev():
+        color = input("Which color player?")
     def buildDev(self, color):
         print("build dev card")
         #subtract resources, add dev card to hand

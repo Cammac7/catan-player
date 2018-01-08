@@ -12,6 +12,12 @@
 #    def play(self):
 #
 
+class Card(Enum):
+    KNIGHT = 1
+    RESOURCE = 2
+    ROAD_BUILDING = 3
+    YEAR_OF_PLENTY = 4
+    MONOPOLY = 5
 
 class Node:
     def __init__(self):
@@ -31,6 +37,8 @@ class Player:
         self.edges = [] #do we need this?
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
         self.remaining = {} #remaining roads, settlements and cities
+        self.longestRoad
+        self.largestArmy
 
     def updateVPs(self):#do I need this function? could update for each action
         newVP = 0

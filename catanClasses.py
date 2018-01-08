@@ -22,13 +22,10 @@ class Player:
         #self.nodes = {} #(x,y):node
         #self.edges = [] #do we need this?
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
-<<<<<<< Updated upstream
         self.remaining = {} #remaining roads, settlements and cities
         self.longestRoad = false
         self.largestArmy = false
-=======
         self.remaining = Counter() #remaining roads, settlements and cities
->>>>>>> Stashed changes
 
     def updateVPs(self):#do I need this function? could update for each action
         newVP = 0

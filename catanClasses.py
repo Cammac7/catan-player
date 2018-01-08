@@ -37,8 +37,8 @@ class Player:
         self.edges = [] #do we need this?
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
         self.remaining = {} #remaining roads, settlements and cities
-        self.longestRoad
-        self.largestArmy
+        self.longestRoad = false
+        self.largestArmy = false
 
     def updateVPs(self):#do I need this function? could update for each action
         newVP = 0

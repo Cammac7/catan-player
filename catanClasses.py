@@ -1,17 +1,3 @@
-#class Card:
-#    def __init__(self, ctype):
-#        self.name = ctype
-#
-#    def play(self):
-#        raise Exception("Not Implemented")
-#
-#class Monopoly(Card):
-#    def __init__(self):
-#        Card.__init__(self, "Monopoly")
-#
-#    def play(self):
-#
-
 class Card(Enum):
     KNIGHT = 1
     RESOURCE = 2
@@ -30,15 +16,19 @@ class Node:
 
 class Player:
     def __init__(self, color):
-        self.hand = Counter() #resouce cards
+        self.hand = Counter() #resouce cards (initialized to 4brick, 4wood,2wool, 2 grain)
         self.cards = [] #development cards
         self.color = color #player color
-        self.nodes = {} #(x,y):node
-        self.edges = [] #do we need this?
+        #self.nodes = {} #(x,y):node
+        #self.edges = [] #do we need this?
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
+<<<<<<< Updated upstream
         self.remaining = {} #remaining roads, settlements and cities
         self.longestRoad = false
         self.largestArmy = false
+=======
+        self.remaining = Counter() #remaining roads, settlements and cities
+>>>>>>> Stashed changes
 
     def updateVPs(self):#do I need this function? could update for each action
         newVP = 0
@@ -86,7 +76,20 @@ class CatanBoard:
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Player(compColor)
-        first = input("who is going first? (put their color)")
+        self.initialPlacement()
+
+
+    def initialPlacement():
+        for i in range(2):
+            toPlace = set(self.players.keys())
+            while len(toPlace) > 0:
+                pColor = input("Who is placing?")
+                setLoc = input("Location of Placed Settlement: ")
+                setRd = input("Location of road end: ")
+                self.buildSettle(pColor,setLoc)
+                self.buildRoad(pColor,setLoc,setRd)
+                toPlace.remove(pColor)
+
 
     def buildTileList():
         tList = []
@@ -118,7 +121,6 @@ class CatanBoard:
         selecNode.owner = color
         selecNode.structure = 1
         player = self.players[color]
-        player.nodes[location] = selecNode
         player.victoryPoints += 1 #this is faster than running the function
 
     def buildCity(self, location):

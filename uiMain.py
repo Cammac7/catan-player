@@ -3,12 +3,42 @@
 import math
 import os
 import pygame
+from enum import Enum
 from pygame.locals import *
 
 DATA_DIR = 'data'
+HEX_RADIUS = 32
+BOARD = [
+    [0, 0, 3, 0, 6, 0, 2, 0, 0],
+    [0, 4, 0, 5, 0, 4, 0, 6, 0],
+    [1, 0, 3, 0, 2, 0, 3, 0, 2],
+    [0, 4, 0, 6, 0, 6, 0, 5, 0],
+    [0, 0, 5, 0, 2, 0, 3, 0, 0],
+]
+
+class Terrain(Enum):
+    NONE = 0
+    DESERT = 1
+    FIELDS = 2
+    FOREST = 3
+    HILLS = 4
+    MOUNTAINS = 5
+    PASTURE = 6
+
+IMAGE_NAME = {
+    Terrain.DESERT: 'desert.png',
+    Terrain.FIELDS: 'fields.png',
+    Terrain.FOREST: 'forest.png',
+    Terrain.HILLS: 'hills.png',
+    Terrain.MOUNTAINS: 'mountains.png',
+    Terrain.PASTURE: 'pasture.png',
+}
 
 def get_error():
     return SystemExit(str(pygame.compat.geterror()))
+
+def get_image_name(terrain):
+    return IMAGE_NAME.get(terrain, 'test_hex.png')
 
 # colorkey is the color to use for transparency.
 def load_image(name, colorkey=None):
@@ -38,25 +68,13 @@ def load_sound(name):
         raise get_error()
     return sound
 
-def draw_ngon(surface, color, n, radius, position):
-    points = []
-    for i in range(0, n):
-        points.append((math.sin(i / n * 2 * math.pi) * radius + position[0],
-                       math.cos(i / n * 2 * math.pi) * radius + position[1]))
-    return pygame.draw.polygon(surface, color, points)
-
-def draw_aa_ngon(surface, color, n, radius, position):
-    points = []
-    for i in range(0, n):
-        points.append((math.sin(i / n * 2 * math.pi) * radius + position[0],
-                       math.cos(i / n * 2 * math.pi) * radius + position[1]))
-    return pygame.draw.aalines(surface, color, True, points, False)
 
 class HexTile(pygame.sprite.Sprite):
     """HexTile represents one of the hexagonal tiles that form the board."""
-    def __init__(self):
+    def __init__(self, terrain, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image('test_hex.png')
+        self.image, self.rect = load_image(get_image_name(terrain))
+        self.rect.topleft = x, y
 
     def update(self):
         pass
@@ -76,10 +94,27 @@ def main():
     screen.blit(background, (0, 0))
     pygame.display.flip()
 
-    clock = pygame.time.Clock()
-    hex_tile = HexTile()
-    all_sprites = pygame.sprite.RenderPlain(hex_tile)
+    # TODO: Center the board on the screen.
+    #center_x, center_y = screen.get_rect().center
+    #board_height = len(BOARD) * HEX_RADIUS
+    #board_width = len(BOARD[0]) * HEX_RADIUS * 3 / 2
+    #start_x = center_x - (board_width / 2)
+    #start_y = center_y - (board_height / 2)
+    start_x = 0
+    start_y = 0
+    sprites = []
+    for i in range(len(BOARD)):
+        for j in range(len(BOARD[i])):
+            terrain = Terrain(BOARD[i][j])
+            if terrain != Terrain.NONE:
+                # Multiple the height by 3/2 so that the hex tiles are touching.
+                sprites.append(HexTile(
+                        terrain,
+                        start_x + j * HEX_RADIUS,
+                        start_y + i * HEX_RADIUS * 3 / 2))
+    all_sprites = pygame.sprite.Group(sprites)
 
+    clock = pygame.time.Clock()
     running = True
     while running:
         clock.tick(60)
@@ -98,8 +133,6 @@ def main():
 
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
-        draw_ngon(screen, (255, 255, 255), 6, 32, (128, 128))
-        draw_aa_ngon(screen, (255, 255, 255), 6, 32, (256, 128))
         pygame.display.flip()
 
     pygame.quit()

@@ -1,3 +1,5 @@
+from enum import Enum
+
 class Card(Enum):
     KNIGHT = 1
     RESOURCE = 2
@@ -75,7 +77,7 @@ class CatanBoard:
         self.deck = [] #stack of dev cards
         self.winner = False
 
-    def play():
+    def play(self):
     #Setup
         self.setTerrain(self.buildTileList())
         #Assign player colors
@@ -91,20 +93,42 @@ class CatanBoard:
                 'build city': userBuildCity(),
                 'build road': userBuildRoad(),
                 'build dev card': userBuildDev(),
+                'hello': hello(),
                 'make trade': None,
                 'monopoly' : None,
                 'year of plenty' : None,
                 'knight': None,
-                'road building': None
-                'roll' : userRoll(diceTotal) #not yet implemented. Gonna want to parse string and pass val like "roll 10"
+                'road building': None,
+                'options': printOptions(),
                 'play turn': None
                 }
         while winner == False:
-           winner = True #this is where we'll run the game 
+           updateState = input("Input state updates. Type 'options' to see possible commands:")
+           eval(functional_mappings[updateState])
+           winner = True
            #take input, map it to a function using the above
            #when computer's turn, call play turn, execute computer turn
+    
+    def printOptions(self):
+        print(
+            '''
+            Input Options:
+            'initial placement' -- This is to start the game. Run twice for each player.
+            'build settlement'
+            'build city'
+            'build road'
+            'build dev card'
+            'make trade'
+            'monopoly'
+            'year of plenty'
+            'knight'
+            'road building'
+            'play turn' -- This prompts the AI to make it's turn based on current board state.
+             '''
+            )
 
-    def initialPlacement():
+
+    def initialPlacement(self):
         pColor = input("Who is placing?")
         setLoc = input("Location of Placed Settlement: ")
         setRd = input("Location of road end: ")
@@ -112,10 +136,10 @@ class CatanBoard:
         self.buildSettle(pColor,setLoc)
         self.buildRoad(pColor,setLoc,setRd)
     
-    def hello():
+    def hello(self):
         print("Hellloooo!!")
 
-    def buildTileList():
+    def buildTileList(self):
         tList = []
         lMap = {'g':'grain','b':'brick','o':'ore','l':'lumber','w':'wool','d':'dese    rt'}
         while True:
@@ -129,11 +153,11 @@ class CatanBoard:
                 number = int(com[0:-1])
                 tList.append((resource,number))
 
-    def addPlayers(colorList):
+    def addPlayers(self,colorList):
         for color in colorList:
             self.players[color] = Player(color)
     
-    def userAddPort():
+    def userAddPort(self):
         location = input("What's the location of the node?")
         portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
         self.addPort(location,portType)
@@ -143,7 +167,7 @@ class CatanBoard:
     def addNode(self,location):
         self.nodelist[location] = Node()
 
-    def userBuildSettle():
+    def userBuildSettle(self):
         color = input("Which color player?")
         loc = input("What location? (x,y)")
         self.buildSettle(color, loc)
@@ -155,7 +179,7 @@ class CatanBoard:
         player = self.players[color]
         player.victoryPoints += 1 #this is faster than running the function
 
-    def userBuildCity():
+    def userBuildCity(self):
         loc = input("What location? (x,y)")
         self.buildCity(loc)
     def buildCity(self, location):
@@ -163,7 +187,7 @@ class CatanBoard:
         selecNode.structure = 2
         self.players[selecNode.owner].updateVPs()
 
-    def userBuildRoad():
+    def userBuildRoad(self):
         color = input("Which color player?")
         fromL = input("From which location? (x,y)")
         toL = input("To which location? (x,y)")
@@ -174,7 +198,7 @@ class CatanBoard:
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
 
-    def userBuildDev():
+    def userBuildDev(self):
         color = input("Which color player?")
     def buildDev(self, color):
         print("build dev card")

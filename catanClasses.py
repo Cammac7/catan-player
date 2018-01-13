@@ -1,4 +1,5 @@
 from enum import Enum
+from collections import Counter
 
 class Card(Enum):
     KNIGHT = 1
@@ -39,8 +40,8 @@ class Player:
         self.color = color #player color
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
         self.remaining = {} #remaining roads, settlements and cities
-        self.longestRoad = false
-        self.largestArmy = false
+        self.longestRoad = False
+        self.largestArmy = False
         self.remaining = Counter() #remaining roads, settlements and cities
 
     def updateVPs(self):#do I need this function? could update for each action
@@ -141,15 +142,18 @@ class CatanBoard:
 
     def buildTileList(self):
         tList = []
-        lMap = {'g':'grain','b':'brick','o':'ore','l':'lumber','w':'wool','d':'dese    rt'}
+        lMap = {'g':'grain','b':'brick','o':'ore','l':'lumber','w':'wool','d':'desert'}
         while True:
             com = input('Next Tile:')
             if com == "build":
                 return tList
             if com == "undo":
                 tList.pop()
+            if com == "default":
+                tList = [('ore',10),('wool',2),('lumber',9),('grain',12),('brick',6),('wool',4),('brick',10),('grain',9),('lumber',11),('desert',0),('lumber',3),('ore',8),('lumber',8),('ore',3),('grain',4),('wool',5),('brick',5),('grain',6),('wool',11)]
+                return tList
             else:
-                resource = lMap[com[-1:]]
+                resource = lMap.get(com[-1:],'desert')
                 number = int(com[0:-1])
                 tList.append((resource,number))
 

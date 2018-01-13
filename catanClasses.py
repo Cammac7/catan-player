@@ -1,5 +1,7 @@
 from enum import Enum
 from collections import Counter
+import re
+import ast
 
 class Card(Enum):
     KNIGHT = 1
@@ -87,6 +89,7 @@ class CatanBoard:
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Player(compColor)
+        print(self.nodelist[(5,6)])
         self.initialPlacement()
         function_mappings = {
                 'initial placement': initalPlacement(),
@@ -131,8 +134,8 @@ class CatanBoard:
 
     def initialPlacement(self):
         pColor = input("Who is placing?")
-        setLoc = input("Location of Placed Settlement: ")
-        setRd = input("Location of road end: ")
+        setLoc = inValLoc("Location of Placed Settlement: ")
+        setRd = inValLoc("Location of road end: ")
         #If color == computer then run our initial placement function
         self.buildSettle(pColor,setLoc)
         self.buildRoad(pColor,setLoc,setRd)
@@ -162,7 +165,7 @@ class CatanBoard:
             self.players[color] = Player(color)
     
     def userAddPort(self):
-        location = input("What's the location of the node?")
+        location = inValLoc("What's the location of the node? (x,y) ")
         portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
         self.addPort(location,portType)
     def addPort(self,location,portType):
@@ -173,7 +176,7 @@ class CatanBoard:
 
     def userBuildSettle(self):
         color = input("Which color player?")
-        loc = input("What location? (x,y)")
+        loc = inValLoc("What location? (x,y)")
         self.buildSettle(color, loc)
     def buildSettle(self,color,location):
         #this needs to use resources
@@ -184,7 +187,7 @@ class CatanBoard:
         player.victoryPoints += 1 #this is faster than running the function
 
     def userBuildCity(self):
-        loc = input("What location? (x,y)")
+        loc = inValLoc("What location? (x,y)")
         self.buildCity(loc)
     def buildCity(self, location):
         selecNode = self.nodelist[location]
@@ -193,12 +196,12 @@ class CatanBoard:
 
     def userBuildRoad(self):
         color = input("Which color player?")
-        fromL = input("From which location? (x,y)")
-        toL = input("To which location? (x,y)")
+        fromL = inValLoc("From which location? (x,y)")
+        toL = inValLoc("To which location? (x,y)")
         self.buildRoad(color,fromL,toL)
     def buildRoad(self, color, fromLoc, toLoc):
-        fromNode = nodelist[fromLoc]
-        toNode = nodelist[toLoc]
+        fromNode = self.nodelist[fromLoc]
+        toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
 
@@ -229,6 +232,16 @@ class CatanBoard:
                     if adj in self.nodelist:
                         self.nodelist[loc].neighbors[self.nodelist[adj]] = None #assign adjacent neighbors
 
+def inValLoc(prompt):
+    locPat = re.compile("^\(\d{1,2},\d{1,2}\)$")
+    while True:
+        value = input(prompt)
+        if not locPat.match(value):
+            print("Sorry, format needs to be (x,y)")
+            continue
+        else:
+            break
+    return ast.literal_eval(value.replace(',',', '))
 
 #tileList given left->right top->bottom
 tileList = [('ore', 10), ('wool', 2), ('lumber', 9), ('grain', 12), ('brick', 6), ('wool', 4), ('brick', 10), ('grain', 9), ('lumber', 11), ('desert', 0), ('lumber', 3), ('ore', 8), ('lumber', 8), ('ore', 3), ('grain', 4), ('wool', 5), ('brick', 5), ('grain', 6), ('wool', 11)]

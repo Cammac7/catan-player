@@ -92,18 +92,18 @@ class CatanBoard:
         print(self.nodelist[(5,6)])
         self.initialPlacement()
         function_mappings = {
-                'initial placement': initalPlacement(),
-                'build settlement': userBuildSettle(),
-                'build city': userBuildCity(),
-                'build road': userBuildRoad(),
-                'build dev card': userBuildDev(),
-                'hello': hello(),
+                'initial placement': self.initialPlacement(),
+                'build settlement': self.userBuildSettle(),
+                'build city': self.userBuildCity(),
+                'build road': self.userBuildRoad(),
+                'build dev card': self.userBuildDev(),
+                'hello': self.hello(),
                 'make trade': None,
                 'monopoly' : None,
                 'year of plenty' : None,
                 'knight': None,
                 'road building': None,
-                'options': printOptions(),
+                'options': self.printOptions(),
                 'play turn': None
                 }
         while winner == False:

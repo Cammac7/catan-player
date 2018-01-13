@@ -91,28 +91,33 @@ class CatanBoard:
         self.players[compColor] = Player(compColor)
         print(self.nodelist[(5,6)])
         self.initialPlacement()
+        print("Finished Initial Placement")
         function_mappings = {
-                'initial placement': self.initialPlacement(),
-                'build settlement': self.userBuildSettle(),
-                'build city': self.userBuildCity(),
-                'build road': self.userBuildRoad(),
-                'build dev card': self.userBuildDev(),
-                'hello': self.hello(),
+                'initial placement': initialPlacement,
+                'build settlement': userBuildSettle,
+                'build city': userBuildCity,
+                'build road': userBuildRoad,
+                'build dev card': userBuildDev,
+                'hello': hello,
                 'make trade': None,
                 'monopoly' : None,
                 'year of plenty' : None,
                 'knight': None,
                 'road building': None,
-                'options': self.printOptions(),
+                'options': printOptions,
                 'play turn': None
                 }
         while winner == False:
-           updateState = input("Input state updates. Type 'options' to see possible commands:")
-           eval(functional_mappings[updateState])
-           winner = True
-           #take input, map it to a function using the above
-           #when computer's turn, call play turn, execute computer turn
-    
+            while True:
+                try:
+                    return function_mappings[input("Input state updates. Type 'options' to see possible commands:")]
+                except KeyError:
+                    print('Invalid command, try again')
+                    self.printOptions()
+            winner = True
+            #take input, map it to a function using the above
+            #when computer's turn, call play turn, execute computer turn
+
     def printOptions(self):
         print(
             '''
@@ -133,12 +138,14 @@ class CatanBoard:
 
 
     def initialPlacement(self):
+        print("running inital placement")
         pColor = input("Who is placing?")
         setLoc = inValLoc("Location of Placed Settlement: ")
         setRd = inValLoc("Location of road end: ")
         #If color == computer then run our initial placement function
         self.buildSettle(pColor,setLoc)
         self.buildRoad(pColor,setLoc,setRd)
+        print("ended initial placement")
     
     def hello(self):
         print("Hellloooo!!")

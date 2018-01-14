@@ -1,4 +1,5 @@
-#catan-player
+catan-player
+============
 
 This repository is for work on an AI named A.A.R.O.N., designed to beat human players in real-world catan via state updates from the command line.
 

@@ -57,10 +57,6 @@ class Player:
                 newVP += 2
         self.victoryPoints = newVP
 
-    def initialTurn(self):
-        raise Exception("Not Implemented")
-
-
 class Human(Player):
     def __init__(self, color):
         Player.__init__(self, color)

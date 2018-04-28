@@ -62,17 +62,24 @@ class CatanBoard:
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Computer(compColor)
-        self.initialPlacement()
+        playerIndex = self.initialPlacement()
         print("Finished Initial Placement")
+        self.addPorts()
         #TODO Added playing of each turn
+        while self.winner == False:
+            current_player = list(self.players.values())[playerIndex%len(self.players)]
+            current_player.playTurn(self)
+            playerIndex += 1
+
 
     def initialPlacement(self):
         print("running inital placement")
         pFirst = input("Who is first? ")
         iFirst = list(self.players.keys()).index(pFirst)
         for i in range(iFirst, iFirst+((2*len(self.players))-1)):
-            current_player = list(self.players.values())[i]
+            current_player = list(self.players.values())[i%len(self.players)]
             current_player.initPlace(self)
+        return iFirst
 
     def buildTileList(self):
         tList = []
@@ -94,21 +101,24 @@ class CatanBoard:
     def addPlayers(self,colorList):
         for color in colorList:
             self.players[color] = Human(color)
-
-    def userAddPort(self):
-        location = inValLoc("What's the location of the node? (x,y) ")
-        portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
-        self.addPort(location,portType)
+            
     def addPort(self,location,portType):
         self.nodelist[location].port = portType
+        
+    def addPorts(self):
+        for i in range(18):
+            location = inValLoc("What's the location of the node? (x,y) ")
+            portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
+            #TODO gotta make "portType" convert to and check for enum
+            self.addPort(location,portType)
+
+    def buildDev(self, color):
+        print("build dev card")
+        #subtract resources, add dev card to hand
 
     def addNode(self,location):
         self.nodelist[location] = Node()
 
-    def userBuildSettle(self):
-        color = input("Which color player?")
-        loc = inValLoc("What location? (x,y)")
-        self.buildSettle(color, loc)
     def buildSettle(self,color,location):
         #this needs to use resources
         selecNode = self.nodelist[location]
@@ -117,31 +127,17 @@ class CatanBoard:
         player = self.players[color]
         player.victoryPoints += 1 #this is faster than running the function
 
-    def userBuildCity(self):
-        loc = inValLoc("What location? (x,y)")
-        self.buildCity(loc)
     def buildCity(self, location):
         selecNode = self.nodelist[location]
         selecNode.structure = 2
         self.players[selecNode.owner].updateVPs()
 
-    def userBuildRoad(self):
-        color = input("Which color player?")
-        fromL = inValLoc("From which location? (x,y)")
-        toL = inValLoc("To which location? (x,y)")
-        self.buildRoad(color,fromL,toL)
     def buildRoad(self, color, fromLoc, toLoc):
         fromNode = self.nodelist[fromLoc]
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
-
-    def userBuildDev(self):
-        color = input("Which color player?")
-    def buildDev(self, color):
-        print("build dev card")
-        #subtract resources, add dev card to hand
-
+        
     def setTerrain(self,tileList):
         #list tiles left->right and top->bottom
         #These tupes are x/y coordinates of tile centers
@@ -161,15 +157,4 @@ class CatanBoard:
                 self.nodelist[loc].returns[item[1]] = item[0]
                 for adj in [(loc[0]+1,loc[1]-1),(loc[0],loc[1]-2),(loc[0]-1,loc[1]-1),(loc[0]-1,loc[1]+1),(loc[0],loc[1]+2),(loc[0]+1,loc[1]+1)]:
                     if adj in self.nodelist:
-                        self.nodelist[loc].neighbors[self.nodelist[adj]] = None #assign adjacent neighbors
-
-def inValLoc(prompt):
-    locPat = re.compile("^\(\d{1,2},\d{1,2}\)$")
-    while True:
-        value = input(prompt)
-        if not locPat.match(value):
-            print("Sorry, format needs to be (x,y)")
-            continue
-        else:
-            break
-    return ast.literal_eval(value.replace(',',', '))
+                        self.nodelist[loc].neighbors[self.nodelist[adj]] = None #assign adjacent neighbors 

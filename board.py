@@ -46,15 +46,13 @@ class CatanBoard:
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Computer(compColor)
-        firstPlayerIndex = self.initialPlacement()
+        playerIndex = self.initialPlacement()
         print("Finished Initial Placement")
         #TODO Added playing of each turn
         while self.winner == False:
-            pFirst = input("Who is first? ")
-            iFirst = list(self.players.keys()).index(pFirst)
-            for i in range(iFirst, iFirst+((2*len(self.players))-1)):
-                current_player = list(self.players.values())[i%len(self.players)]
-                current_player.initPlace(self)
+            current_player = list(self.players.values())[playerIndex%len(self.players)]
+            current_player.playTurn(self)
+            playerIndex += 1
 
 
     def initialPlacement(self):

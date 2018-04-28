@@ -35,6 +35,35 @@ class Player:
             elif card == 'Longest Road' or card == 'Largest Army':
                 newVP += 2
         self.victoryPoints = newVP
+        
+    def buildRoad(self):
+        color = input("Which color player?")
+        fromL = inValLoc("From which location? (x,y)")
+        toL = inValLoc("To which location? (x,y)")
+        self.buildRoad(color,fromL,toL)
+        
+    def buildCity(self):
+        loc = inValLoc("What location? (x,y)")
+        self.buildCity(loc)
+        
+    def buildDev(self):
+        color = input("Which color player?")
+        
+    def buildSettle(self):
+        color = input("Which color player?")
+        loc = inValLoc("What location? (x,y)")
+        self.buildSettle(color, loc)
+
+def inValLoc(prompt):
+    locPat = re.compile("^\(\d{1,2},\d{1,2}\)$")
+    while True:
+        value = input(prompt)
+        if not locPat.match(value):
+            print("Sorry, format needs to be (x,y)")
+            continue
+        else:
+            break
+    return ast.literal_eval(value.replace(',',', '))
 
 class Human(Player):
     def __init__(self, color):

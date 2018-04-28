@@ -101,7 +101,7 @@ class CatanBoard:
         clrList = players.split(",")
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
-        self.players[compColor] = Player(compColor)
+        self.players[compColor] = Computer(compColor)
         self.initialPlacement()
         print("Finished Initial Placement")
         #TODO Added playing of each turn
@@ -109,8 +109,8 @@ class CatanBoard:
     def initialPlacement(self):
         print("running inital placement")
         pFirst = input("Who is first? ")
-        iFirst = self.players.keys().index(pFirst)
-        for i in range(iFirst, iFirst+((2*self.players.len())-1)):
+        iFirst = list(self.players.keys()).index(pFirst)
+        for i in range(iFirst, iFirst+((2*len(self.players))-1)):
             current_player = list(self.players.values())[i]
             current_player.initPlace()
 
@@ -133,7 +133,7 @@ class CatanBoard:
 
     def addPlayers(self,colorList):
         for color in colorList:
-            self.players[color] = Player(color)
+            self.players[color] = Human(color)
     
     def userAddPort(self):
         location = inValLoc("What's the location of the node? (x,y) ")

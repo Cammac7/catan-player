@@ -65,7 +65,17 @@ class Computer(Player):
     def __init__(self, color):
         Player.__init__(self, color)
 
-    def playTurn():#need to implement
+    def initPlace(self, inboard):
+        nodeChoice = random.sample(inboard.nodelist)
+        while nodeChoice.owner != None:
+            nodeChoice = random.sample(inboard.nodelist)
+        roadDir = random.sample(nodeChoice.neighbors)
+        while nodeChoice.neighbors[roadDir] != None:
+            roadDir = random.sample(nodeChoice.neighbors)
+        inboard.buildSettle(self.color, nodeChoice)
+        inboard.buildRoad(self.color, nodeChoice, roadDir)
+        
+    def playTurn(self):#need to implement
         return True
 
 class CatanBoard:
@@ -135,9 +145,11 @@ class CatanBoard:
 
     def initialPlacement(self):
         print("running inital placement")
-        pColor = input("Who is placing?")
-        setLoc = inValLoc("Location of Placed Settlement: ")
-        setRd = inValLoc("Location of road end: ")
+        pColor = input("Who is first?")
+        for color in self.players:
+            print("Currently Placing: {}".format(color))
+            setLoc = inValLoc("Location of Placed Settlement: ")
+            setRd = inValLoc("Location of road end: ")
         #If color == computer then run our initial placement function
         self.buildSettle(pColor,setLoc)
         self.buildRoad(pColor,setLoc,setRd)
@@ -156,7 +168,7 @@ class CatanBoard:
             if com == "undo":
                 tList.pop()
             if com == "default":
-                tList = [('ore',10),('wool',2),('lumber',9),('grain',12),('brick',6),('wool',4),('brick',10),('grain',9),('lumber',11),('desert',0),('lumber',3),('ore',8),('lumber',8),('ore',3),('grain',4),('wool',5),('brick',5),('grain',6),('wool',11)]
+                tList = [('ore',10),('wool',2),('lumber',9),('grain',12),('brick',6),('wool',4),('brick',10),('grain',9),('lumber',11),('desert',0),('lumber',3),('ore',8),('lumber',8),('ore',3),('grain',4),('wool',5),('brick',5),('grain',6),('wool',11) ]
                 return tList
             else:
                 resource = lMap.get(com[-1:],'desert')

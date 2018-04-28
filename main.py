@@ -1,5 +1,5 @@
 # This file contains the main function for the Catan Player project.
-from catanClasses import CatanBoard
+from board import CatanBoard
 
 def main():
     myboard = CatanBoard()

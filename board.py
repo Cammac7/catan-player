@@ -1,8 +1,11 @@
+# This file contains classes for the Catan board.
+
+import re
+import ast
 from enum import Enum
 from collections import Counter
 from collections import OrderedDict
-import re
-import ast
+from player import *
 
 class Card(Enum):
     KNIGHT = 1
@@ -18,15 +21,6 @@ class Resource(Enum):
     LUMBER = 4
     WOOL = 5
 
-class PlayerColors(Enum):#ok player colors should be enums too. Everything is string rn, need to update🙄
-    RED  = 1
-    BLUE = 2
-    ORANGE = 3
-    WHITE = 4
-    BLACK = 5
-    GREEN = 6
-    BANK = 7
-
 class Node:
     def __init__(self):
         self.owner = None #color, or none
@@ -34,56 +28,6 @@ class Node:
         self.port = None #port type or None
         self.returns = {} #dict of num:resource, or probability of resource
         self.neighbors = {} #{neighborNode:edgeColor}
-
-
-class Player:
-    def __init__(self, color):
-        self.hand = Counter() #resouce cards (initialized to 4brick, 4wood,2wool, 2 grain)
-        self.cards = [] #development cards
-        self.color = color #player color
-        self.victoryPoints = 0 #maybe can contain decimals to represent probability
-        self.longestRoad = False
-        self.largestArmy = False
-        self.remaining = Counter() #remaining roads, settlements and cities
-
-    def updateVPs(self):#do I need this function? could update for each action
-        newVP = 0
-        for node in self.nodes.values():
-            newVP += node.structure
-        for card in self.cards:
-            if card == 'VP':
-                newVP += 1
-            elif card == 'Longest Road' or card == 'Largest Army':
-                newVP += 2
-        self.victoryPoints = newVP
-
-class Human(Player):
-    def __init__(self, color):
-        Player.__init__(self, color)
-
-    def initPlace(self, inboard):
-        setLoc = inValLoc("Location of Placed Settlement: ")
-        setRd = inValLoc("Location of road end: ")
-        inboard.buildSettle(self.color, setLoc)
-        inboard.buildRoad(self.color, setLoc, setRd)
-
-class Computer(Player):
-    def __init__(self, color):
-        Player.__init__(self, color)
-
-    def initPlace(self, inboard):
-        #TODO: Make this a real function. Currently does random selection
-        nodeChoice = random.sample(inboard.nodelist)
-        while nodeChoice.owner != None:
-            nodeChoice = random.sample(inboard.nodelist)
-        roadDir = random.sample(nodeChoice.neighbors)
-        while nodeChoice.neighbors[roadDir] != None:
-            roadDir = random.sample(nodeChoice.neighbors)
-        inboard.buildSettle(self.color, nodeChoice)
-        inboard.buildRoad(self.color, nodeChoice, roadDir)
-
-    def playTurn(self):#need to implement
-        return True
 
 class CatanBoard:
     def __init__(self):

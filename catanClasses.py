@@ -72,6 +72,7 @@ class Computer(Player):
         Player.__init__(self, color)
 
     def initPlace(self, inboard):
+        #TODO: Make this a real function. Currently does random selection
         nodeChoice = random.sample(inboard.nodelist)
         while nodeChoice.owner != None:
             nodeChoice = random.sample(inboard.nodelist)

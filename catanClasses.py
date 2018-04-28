@@ -112,7 +112,7 @@ class CatanBoard:
         iFirst = list(self.players.keys()).index(pFirst)
         for i in range(iFirst, iFirst+((2*len(self.players))-1)):
             current_player = list(self.players.values())[i]
-            current_player.initPlace()
+            current_player.initPlace(self)
 
     def buildTileList(self):
         tList = []

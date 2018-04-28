@@ -2,11 +2,12 @@
 
 import re
 import ast
-from enum import Enum
+from enum import Enum, unique
 from collections import Counter
 from collections import OrderedDict
 from player import *
 
+@unique
 class Card(Enum):
     KNIGHT = 1
     RESOURCE = 2
@@ -14,12 +15,27 @@ class Card(Enum):
     YEAR_OF_PLENTY = 4
     MONOPOLY = 5
 
+    def FromString(s):
+        s = s.upper()
+        for c in Card:
+            if c.name == s:
+                return c
+        return False
+
+@unique
 class Resource(Enum):
     ORE = 1
     BRICK = 2
     GRAIN = 3
     LUMBER = 4
     WOOL = 5
+
+    def FromString(s):
+        s = s.upper()
+        for r in Resource:
+            if r.name == s:
+                return r
+        return False
 
 class Node:
     def __init__(self):

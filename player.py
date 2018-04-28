@@ -1,12 +1,13 @@
 # This file contains player-related classes.
 
-from enum import Enum
+from enum import Enum, unique
 from collections import Counter
 from collections import OrderedDict
 import re
 import ast
 
-class PlayerColors(Enum):#ok player colors should be enums too. Everything is string rn, need to update🙄
+@unique
+class PlayerColors(Enum):
     RED  = 1
     BLUE = 2
     ORANGE = 3
@@ -14,6 +15,13 @@ class PlayerColors(Enum):#ok player colors should be enums too. Everything is st
     BLACK = 5
     GREEN = 6
     BANK = 7
+
+    def FromString(s):
+        s = s.upper()
+        for c in PlayerColors:
+            if c.name == s:
+                return c
+        return False
 
 class Player:
     def __init__(self, color):

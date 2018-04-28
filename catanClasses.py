@@ -1,5 +1,6 @@
 from enum import Enum
 from collections import Counter
+from collections import OrderedDict
 import re
 import ast
 
@@ -41,7 +42,6 @@ class Player:
         self.cards = [] #development cards
         self.color = color #player color
         self.victoryPoints = 0 #maybe can contain decimals to represent probability
-        self.remaining = {} #remaining roads, settlements and cities
         self.longestRoad = False
         self.largestArmy = False
         self.remaining = Counter() #remaining roads, settlements and cities
@@ -60,6 +60,12 @@ class Player:
 class Human(Player):
     def __init__(self, color):
         Player.__init__(self, color)
+        
+    def initPlace(self, inboard):
+        setLoc = inValLoc("Location of Placed Settlement: ")
+        setRd = inValLoc("Location of road end: ")
+        inboard.buildSettle(self.color, setLoc)
+        inboard.buildRoad(self.color, setLoc, setRd)
 
 class Computer(Player):
     def __init__(self, color):
@@ -82,7 +88,7 @@ class CatanBoard:
     def __init__(self):
         self.nodelist = {} #location:node. 54 total nodes
         self.edgelist = {} #edgename:color ?? or color:[(locA,locB)]
-        self.players = {} #color:player
+        self.players = OrderedDict() #color:player
         self.deck = [] #stack of dev cards
         self.winner = False
 
@@ -145,18 +151,11 @@ class CatanBoard:
 
     def initialPlacement(self):
         print("running inital placement")
-        pColor = input("Who is first?")
-        for color in self.players:
-            print("Currently Placing: {}".format(color))
-            setLoc = inValLoc("Location of Placed Settlement: ")
-            setRd = inValLoc("Location of road end: ")
-        #If color == computer then run our initial placement function
-        self.buildSettle(pColor,setLoc)
-        self.buildRoad(pColor,setLoc,setRd)
-        print("ended initial placement")
-    
-    def hello(self):
-        print("Hellloooo!!")
+        pFirst = input("Who is first? ")
+        iFirst = self.players.keys().index(pFirst)
+        for i in range(iFirst, iFirst+((2*self.players.len())-1)):
+            current_player = list(self.players.values())[i]
+            current_player.initPlace()
 
     def buildTileList(self):
         tList = []

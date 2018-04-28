@@ -14,7 +14,7 @@ class Card(Enum):
 class Resource(Enum):
     ORE = 1
     BRICK = 2
-    GRAIN = 3 
+    GRAIN = 3
     LUMBER = 4
     WOOL = 5
 
@@ -27,7 +27,7 @@ class PlayerColors(Enum):#ok player colors should be enums too. Everything is st
     GREEN = 6
     BANK = 7
 
-class Node: 
+class Node:
     def __init__(self):
         self.owner = None #color, or none
         self.structure = 0#0, 1 for settlement,2 for city none
@@ -60,7 +60,7 @@ class Player:
 class Human(Player):
     def __init__(self, color):
         Player.__init__(self, color)
-        
+
     def initPlace(self, inboard):
         setLoc = inValLoc("Location of Placed Settlement: ")
         setRd = inValLoc("Location of road end: ")
@@ -81,7 +81,7 @@ class Computer(Player):
             roadDir = random.sample(nodeChoice.neighbors)
         inboard.buildSettle(self.color, nodeChoice)
         inboard.buildRoad(self.color, nodeChoice, roadDir)
-        
+
     def playTurn(self):#need to implement
         return True
 
@@ -134,7 +134,7 @@ class CatanBoard:
     def addPlayers(self,colorList):
         for color in colorList:
             self.players[color] = Human(color)
-    
+
     def userAddPort(self):
         location = inValLoc("What's the location of the node? (x,y) ")
         portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
@@ -181,7 +181,7 @@ class CatanBoard:
     def buildDev(self, color):
         print("build dev card")
         #subtract resources, add dev card to hand
-        
+
     def setTerrain(self,tileList):
         #list tiles left->right and top->bottom
         #These tupes are x/y coordinates of tile centers
@@ -213,12 +213,3 @@ def inValLoc(prompt):
         else:
             break
     return ast.literal_eval(value.replace(',',', '))
-
-#tileList given left->right top->bottom
-tileList = [('ore', 10), ('wool', 2), ('lumber', 9), ('grain', 12), ('brick', 6), ('wool', 4), ('brick', 10), ('grain', 9), ('lumber', 11), ('desert', 0), ('lumber', 3), ('ore', 8), ('lumber', 8), ('ore', 3), ('grain', 4), ('wool', 5), ('brick', 5), ('grain', 6), ('wool', 11)]
-myboard = CatanBoard()
-myboard.play()
-#myboard.setTerrain(tileList)
-#for node in myboard.nodelist.values():
-#    nears = [nb.returns for nb in node.neighbors.keys()]
-#    print("Node is: {}. Node neighb is: {}".format(node.returns, nears))

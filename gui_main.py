@@ -1,4 +1,7 @@
-# ui_main contains the main function for the Catan Player.
+# gui_main contains the main function for the Catan Player's GUI.
+# To run gui_main, first install pipenv. See http://docs.python-guide.org/en/latest/dev/virtualenvs/
+# Then install pygame via the following command: "pipenv install pygame"
+# Then you can run gui_main with the following command: "pipenv run python gui_main.py"
 
 import math
 import os

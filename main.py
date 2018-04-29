@@ -1,4 +1,5 @@
 # This file contains the main function for the Catan Player project.
+
 from board import CatanBoard
 
 def main():

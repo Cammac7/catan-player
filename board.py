@@ -26,19 +26,29 @@ class Card(Enum):
 
 @unique
 class Resource(Enum):
-    ORE = 1
-    BRICK = 2
-    GRAIN = 3
-    LUMBER = 4
+    DESERT = 0
+    BRICK = 1
+    GRAIN = 2
+    LUMBER = 3
+    ORE = 4
     WOOL = 5
 
-    def FromString(s):
-        s = s.upper()
-        for r in Resource:
-            if r.name == s:
-                return r
-        return False
+def ResourceFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Resource:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
 
+def RollFromString(s):
+    r = int(s)
+    if r < 2 or r > 12:
+        return None
+    return r
 
 class Node:
     def __init__(self):
@@ -88,26 +98,58 @@ class CatanBoard:
         return iFirst
 
     def buildTileList(self):
+        print("""Input the resources of each of the tiles in order.
+The input format is '<resource> <dice roll>', where dice roll is a number 2-12
+and resource is one of the letters in the following map:
+
+    b   brick
+    g   grain
+    l   lumber
+    o   ore
+    w   wool
+    d   desert
+
+For example, 'w 10' means the tile has a resource of wool and a dice roll of 10.
+Note: The roll for desert tiles will be ignored.
+Other valid inputs are:
+
+    build     Finish inputting tiles
+    undo      Undo the last inputted tile
+    default   Use a default tile configuration
+
+""")
+
+        p = re.compile(r'(\d+)\s+(\w+)')
         tList = []
-        lMap = {'g': 'grain', 'b': 'brick', 'o': 'ore',
-                'l': 'lumber', 'w': 'wool', 'd': 'desert'}
         while True:
-            com = input('Next Tile:')
-            if com == "build":
+            s = input('Next tile: ').strip()
+            if s == "build":
                 return tList
-            if com == "undo":
+            elif s == "undo":
                 tList.pop()
-            if com == "default":
-                tList = [
+            elif s == "default":
+                return [
                     ('ore', 10), ('wool', 2), ('lumber', 9), ('grain', 12), ('brick', 6),
                     ('wool', 4), ('brick', 10), ('grain', 9), ('lumber', 11), ('desert', 0),
                     ('lumber', 3), ('ore', 8), ('lumber', 8), ('ore', 3), ('grain', 4),
                     ('wool', 5), ('brick', 5), ('grain', 6), ('wool', 11)]
-                return tList
             else:
-                resource = lMap.get(com[-1:], 'desert')
-                number = int(com[0:-1])
-                tList.append((resource, number))
+                match = p.match(s)
+                if not match:
+                    print("Invalid input: '{0}'".format(s))
+                    continue
+                resource = ResourceFromString(match.group(2))
+                if resource is None:
+                    print("Invalid resource: '{0}'".format(match.group(2)))
+                    continue
+                roll = 0
+                if resource != Resource.DESERT:
+                    roll = RollFromString(match.group(1))
+                    if roll is None:
+                        print("Invalid dice roll: '{0}'".format(match.group(1)))
+                        continue
+                print("{0} {1}".format(resource, roll))
+                tList.append((resource.name.lower(), roll))
 
     def addPlayers(self, colorList):
         for color in colorList:

@@ -5,6 +5,7 @@ from collections import Counter
 from collections import OrderedDict
 import re
 import ast
+import random
 
 
 @unique
@@ -82,11 +83,18 @@ class Human(Player):
         Player.__init__(self, color)
 
     def initPlace(self, inboard):
+        validSetts = inboard.validInitSetPlace()
         setLoc = inValLoc("Location of Placed Settlement: ")
+        while setLoc not in validSetts:
+            setLoc = inValLoc("Location of Placed Settlement: ")
+        neighbors = list(inboard.nodelist[setLoc].neighbors.keys())
+        possRoads = [loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors]
+        print("Possible Road Directions: {}".format(possRoads))
         setRd = inValLoc("Location of road end: ")
+        while setRd not in possRoads:
+            setRd = inValLoc("Location of road end: ")
         inboard.buildSettle(self.color, setLoc)
         inboard.buildRoad(self.color, setLoc, setRd)
-
 
 class Computer(Player):
     def __init__(self, color):
@@ -94,14 +102,16 @@ class Computer(Player):
 
     def initPlace(self, inboard):
         # TODO: Make this a real function. Currently does random selection
-        nodeChoice = random.sample(inboard.nodelist)
-        while nodeChoice.owner is not None:
-            nodeChoice = random.sample(inboard.nodelist)
-        roadDir = random.sample(nodeChoice.neighbors)
-        while nodeChoice.neighbors[roadDir] is not None:
-            roadDir = random.sample(nodeChoice.neighbors)
+        validSetts = inboard.validInitSetPlace()
+        print("BEEP BOOP BEEP BOOP")
+        print("A.A.R.O.N. IS THINKING")
+        print("A.A.R.O.N. Completed Initial Placement")
+        nodeChoice = random.choice(validSetts)
+        neighbors = list(inboard.nodelist[nodeChoice].neighbors.keys())
+        possRoads = [loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors]
+        roadChoice = random.choice(possRoads)
         inboard.buildSettle(self.color, nodeChoice)
-        inboard.buildRoad(self.color, nodeChoice, roadDir)
+        inboard.buildRoad(self.color, nodeChoice, roadChoice)
 
     def playTurn(self):  # TODO: Need to implement
         return True

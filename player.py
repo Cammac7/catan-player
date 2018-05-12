@@ -85,7 +85,8 @@ class Human(Player):
         options = [key for key in inboard.nodelist if inboard.nodelist[key].owner == None]
         print(options)
         setLoc = inValLoc("Location of Placed Settlement: ")
-        print(inboard.nodelist[setLoc].neighbors)
+        neighbors = list(inboard.nodelist[setLoc].neighbors.keys())
+        print([loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors])
         setRd = inValLoc("Location of road end: ")
         inboard.buildSettle(self.color, setLoc)
         inboard.buildRoad(self.color, setLoc, setRd)

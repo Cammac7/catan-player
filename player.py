@@ -77,6 +77,15 @@ def inValLoc(prompt):
             break
     return ast.literal_eval(value.replace(',', ', '))
 
+def inValRoll(inroll):
+    while True:
+        roll = int(input(inroll))
+        if roll not in [2,3,4,5,6,7,8,9,10,11,12]:
+            print("Sorry, not a valid dice roll")
+            continue
+        else:
+            break
+    return roll
 
 class Human(Player):
     def __init__(self, color):
@@ -95,6 +104,13 @@ class Human(Player):
             setRd = inValLoc("Location of road end: ")
         inboard.buildSettle(self.color, setLoc)
         inboard.buildRoad(self.color, setLoc, setRd)
+    
+    def playTurn(self, inboard):
+        print("")
+        print("Current Turn: {}".format(self.color))
+        roll = inValRoll("What did they roll?: ")
+        inboard.payout(roll)
+
 
 class Computer(Player):
     def __init__(self, color):

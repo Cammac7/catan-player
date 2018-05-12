@@ -185,6 +185,12 @@ Other valid inputs are:
                 portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
                 # TODO gotta make "portType" convert to and check for enum
                 self.addPort(location, portType)
+    
+    def payout(self, roll):
+        payingNodes = [node for node in self.nodelist.values() if roll in node.returns]
+        for node in payingNodes:
+            owner = self.players[node.owner]
+            owner.hand[node[roll]] += node.structure
 
     def buildDev(self, color):
         print("build dev card")

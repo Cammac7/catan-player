@@ -84,6 +84,7 @@ class CatanBoard:
         iFirst = list(self.players.keys()).index(pFirst)
         for i in range(iFirst, iFirst + ((2 * len(self.players)) - 1)):
             current_player = list(self.players.values())[i % len(self.players)]
+            print("Current Turn: Player: {}".format(current_player.color))
             current_player.initPlace(self)
         return iFirst
 
@@ -148,6 +149,12 @@ class CatanBoard:
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
+    
+    def validInitSetPlace(self):
+        openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
+        realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]
+        print("Possible Settlement Locations: {}".format(realOptions))
+        return realOptions
 
     def setTerrain(self, tileList):
         # list tiles left->right and top->bottom

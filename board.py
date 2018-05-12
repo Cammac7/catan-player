@@ -60,6 +60,7 @@ class CatanBoard:
     def play(self):
         # Setup
         self.setTerrain(self.buildTileList())
+        self.addPorts()
         # Assign player colors
         players = input(
             "Enter color of other players in clockwise order, starting to your left "
@@ -70,7 +71,6 @@ class CatanBoard:
         self.players[compColor] = Computer(compColor)
         playerIndex = self.initialPlacement()
         print("Finished Initial Placement")
-        self.addPorts()
         # TODO Added playing of each turn
         while not self.winner:
             current_player = list(self.players.values())[
@@ -84,7 +84,7 @@ class CatanBoard:
         iFirst = list(self.players.keys()).index(pFirst)
         for i in range(iFirst, iFirst + ((2 * len(self.players)) - 1)):
             current_player = list(self.players.values())[i % len(self.players)]
-            print("Current Turn: Player: {}".format(current_player.color))
+            print("Current Turn: Player {}".format(current_player.color))
             current_player.initPlace(self)
         return iFirst
 
@@ -118,11 +118,31 @@ class CatanBoard:
         self.nodelist[location].port = portType
 
     def addPorts(self):
-        for i in range(18):
-            location = inValLoc("What's the location of the node? (x,y) ")
-            portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
-            # TODO gotta make "portType" convert to and check for enum
-            self.addPort(location, portType)
+        preset = input("To set default ports, type 'default'. Any other key for custom.  ")
+        if preset == "default":
+            for loc in [(2,1),(3,0),(5,0),(6,1),(10,7),(10,9),(2,15),(3,16)]:
+                self.addPort(loc, "ANYTHING")
+            #Sheep
+            self.addPort((8,3),"WOOL")
+            self.addPort((9,4),"WOOL")
+            #BRICK
+            self.addPort((1,4),"BRICK")
+            self.addPort((1,6),"BRICK")
+            #LUMBER
+            self.addPort((1,10),"LUMBER")
+            self.addPort((1,12),"LUMBER")
+            #ORE
+            self.addPort((9,12),"ORE")
+            self.addPort((8,13),"ORE")
+            #GRAIN
+            self.addPort((5,16),"GRAIN")
+            self.addPort((6,15),"GRAIN")
+        else:
+            for i in range(18):
+                location = inValLoc("What's the location of the port node? (x,y)port. OR type 'default' to set default ports ")
+                portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
+                # TODO gotta make "portType" convert to and check for enum
+                self.addPort(location, portType)
 
     def buildDev(self, color):
         print("build dev card")

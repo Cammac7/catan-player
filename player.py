@@ -103,6 +103,9 @@ class Computer(Player):
     def initPlace(self, inboard):
         # TODO: Make this a real function. Currently does random selection
         validSetts = inboard.validInitSetPlace()
+        print("BEEP BOOP BEEP BOOP")
+        print("A.A.R.O.N. IS THINKING")
+        print("A.A.R.O.N. Completed Initial Placement")
         nodeChoice = random.choice(validSetts)
         neighbors = list(inboard.nodelist[nodeChoice].neighbors.keys())
         possRoads = [loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors]

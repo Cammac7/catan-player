@@ -5,7 +5,6 @@
 # via the following command: "pipenv install pygame". Then you can run gui_main
 # with the following command: "pipenv run python gui_main.py".
 
-import math
 import os
 import pygame
 from enum import Enum

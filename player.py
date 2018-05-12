@@ -2,7 +2,6 @@
 
 from enum import Enum, unique
 from collections import Counter
-from collections import OrderedDict
 import re
 import ast
 import random
@@ -104,7 +103,7 @@ class Human(Player):
             setRd = inValLoc("Location of road end: ")
         inboard.buildSettle(self.color, setLoc)
         inboard.buildRoad(self.color, setLoc, setRd)
-    
+
     def playTurn(self, inboard):
         print("")
         print("Current Turn: {}".format(self.color))

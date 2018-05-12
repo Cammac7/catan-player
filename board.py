@@ -1,9 +1,7 @@
 # This file contains classes for the Catan board.
 
 import re
-import ast
 from enum import Enum, unique
-from collections import Counter
 from collections import OrderedDict
 from player import *
 
@@ -185,7 +183,7 @@ Other valid inputs are:
                 portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
                 # TODO gotta make "portType" convert to and check for enum
                 self.addPort(location, portType)
-    
+
     def payout(self, roll):
         payingNodes = [node for node in self.nodelist.values() if roll in node.returns]
         for node in payingNodes:
@@ -217,7 +215,7 @@ Other valid inputs are:
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
-    
+
     def validInitSetPlace(self):
         openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
         realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]

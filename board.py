@@ -83,6 +83,7 @@ class CatanBoard:
         while not self.winner:
             current_player = list(self.players.values())[
                 playerIndex % len(self.players)]
+            self.printBoard()
             current_player.playTurn(self)
             playerIndex += 1
 
@@ -220,10 +221,23 @@ Other valid inputs are:
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
 
+    def p(self, s):
+        x = s[0]
+        y = s[1]
+        node = self.nodelist[s]
+        if node.owner == None:
+            return "({:>2},{:>2})".format(x,y)
+        else:
+            ow = node.owner[:1]
+            if node.structure == 2:
+                ow = ow.upper()
+                return "(  {}  )".format(ow)
+
     def validInitSetPlace(self):
         openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
         realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]
         print("Possible Settlement Locations: {}".format(realOptions))
+        self.printBoard()
         return realOptions
 
     def setTerrain(self, tileList):
@@ -251,3 +265,45 @@ Other valid inputs are:
                 if adj in self.nodelist:
                     # assign adjacent neighbors
                     self.nodelist[loc].neighbors[self.nodelist[adj]] = None
+
+    def p(self, s):
+        x = s[0]
+        y = s[1]
+        node = self.nodelist[s]
+        if node.owner == None:
+            return "({:>2},{:>2})".format(x,y)
+        else:
+            ow = node.owner[:1]
+            if node.structure == 2:
+                ow = ow.upper()
+            return "(  {}  )".format(ow)
+
+    def printBoard(self):
+        print("""                       {}         {}         {}
+                      /       \       /       \       /       \                  
+               {}         {}         {}         {}
+                  |               |               |               |                 
+                  |               |               |               |                 
+               {}         {}         {}         {}
+              /       \       /       \       /       \       /       \  
+       {}         {}         {}         {}         {}
+          |               |               |               |               |        
+          |               |               |               |               |           
+       {}         {}         {}         {}         {}
+      /       \       /       \       /       \       /       \       /       \ 
+{}         {}         {}         {}         {}         {}
+  |                |               |               |               |               |                 
+  |                |               |               |               |               |                 
+{}         {}         {}         {}         {}         {}
+      \       /       \       /       \       /       \       /       \       / 
+       {}         {}         {}         {}         {}
+          |               |               |               |               |        
+          |               |               |               |               |           
+       {}         {}         {}         {}         {}
+              \       /       \       /       \       /       \       /  
+               {}         {}         {}         {}
+                  |               |               |               |                 
+                  |               |               |               |                 
+               {}         {}         {}         {}
+                      \       /       \       /       \       /                  
+                       {}         {}         {}""".format(self.p((3,16)), self.p((5,16)), self.p((7,16)), self.p((2,15)), self.p((4,15)), self.p((6,15)), self.p((8,15)), self.p((2,13)), self.p((4,13)), self.p((6,13)), self.p((8,13)), self.p((1,12)), self.p((3,12)), self.p((5,12)), self.p((7,12)), self.p((9,12)), self.p((1,10)), self.p((3,10)), self.p((5,10)), self.p((7,10)), self.p((9,10)), self.p((0,9)), self.p((2,9)), self.p((4,9)), self.p((6,9)), self.p((8,9)), self.p((10,9)), self.p((0,7)), self.p((2,7)), self.p((4,7)), self.p((6,7)), self.p((8,7)), self.p((10,7)), self.p((1,6)), self.p((3,6)), self.p((5,6)), self.p((7,6)), self.p((9,6)), self.p((1,4)), self.p((3,4)), self.p((5,4)), self.p((7,4)), self.p((9,4)), self.p((2,3)), self.p((4,3)), self.p((6,3)), self.p((8,3)), self.p((2,1)), self.p((4,1)), self.p((6,1)), self.p((8,1)), self.p((3,0)), self.p((5,0)), self.p((7,0))))

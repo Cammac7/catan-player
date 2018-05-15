@@ -185,13 +185,14 @@ Other valid inputs are:
                 self.addPort(location, portType)
 
     def payout(self, roll):
-        print(self.nodelist.values()[0])
-        print(self.nodelist.values()[0].returns)
-        payingNodes = [node for node in self.nodelist.values() if roll in node.returns]
+        payingNodes = [node for node in self.nodelist.values() if roll in node.returns and node.owner != None]
+        #payingNodes = [node for node in self.nodelist.values()]
+        print("Paying nodes: {}".format(payingNodes))
         for node in payingNodes:
             print(node.owner)
+            print(node.returns)
             owner = self.players[node.owner]
-            owner.hand[node[roll]] += node.structure
+            owner.hand[node.returns[roll]] += node.structure
 
     def buildDev(self, color):
         print("build dev card")

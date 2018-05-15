@@ -185,8 +185,11 @@ Other valid inputs are:
                 self.addPort(location, portType)
 
     def payout(self, roll):
+        print(self.nodelist.values()[0])
+        print(self.nodelist.values()[0].returns)
         payingNodes = [node for node in self.nodelist.values() if roll in node.returns]
         for node in payingNodes:
+            print(node.owner)
             owner = self.players[node.owner]
             owner.hand[node[roll]] += node.structure
 
@@ -240,9 +243,10 @@ Other valid inputs are:
                 if loc not in self.nodelist:
                     self.addNode(loc)
                 self.nodelist[loc].returns[item[1]] = item[0]
-                for adj in [
-                        (loc[0] + 1, loc[1] - 1), (loc[0], loc[1] - 2), (loc[0] - 1, loc[1] - 1),
-                        (loc[0] - 1, loc[1] + 1), (loc[0], loc[1] + 2), (loc[0] + 1, loc[1] + 1)]:
-                    if adj in self.nodelist:
-                        # assign adjacent neighbors
-                        self.nodelist[loc].neighbors[self.nodelist[adj]] = None
+        for loc in self.nodelist:
+            for adj in [
+                    (loc[0] + 1, loc[1] - 1), (loc[0], loc[1] - 2), (loc[0] - 1, loc[1] - 1),
+                    (loc[0] - 1, loc[1] + 1), (loc[0], loc[1] + 2), (loc[0] + 1, loc[1] + 1)]:
+                if adj in self.nodelist:
+                    # assign adjacent neighbors
+                    self.nodelist[loc].neighbors[self.nodelist[adj]] = None

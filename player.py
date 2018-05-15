@@ -128,5 +128,5 @@ class Computer(Player):
         inboard.buildSettle(self.color, nodeChoice)
         inboard.buildRoad(self.color, nodeChoice, roadChoice)
 
-    def playTurn(self):  # TODO: Need to implement
+    def playTurn(self, inboard):  # TODO: Need to implement
         return True

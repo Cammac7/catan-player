@@ -151,10 +151,10 @@ Other valid inputs are:
                 tList.pop()
             elif s == "default":
                 return [
-                    ('ore', 10), ('wool', 2), ('lumber', 9), ('grain', 12), ('brick', 6),
-                    ('wool', 4), ('brick', 10), ('grain', 9), ('lumber', 11), ('desert', 0),
-                    ('lumber', 3), ('ore', 8), ('lumber', 8), ('ore', 3), ('grain', 4),
-                    ('wool', 5), ('brick', 5), ('grain', 6), ('wool', 11)]
+                    (Resource.ORE, 10), (Resource.WOOL, 2), (Resource.LUMBER, 9), (Resource.GRAIN, 12), (Resource.BRICK, 6),
+                    (Resource.WOOL, 4), (Resource.BRICK, 10), (Resource.GRAIN, 9), (Resource.LUMBER, 11), (Resource.DESERT, 0),
+                    (Resource.LUMBER, 3), (Resource.ORE, 8), (Resource.LUMBER, 8), (Resource.ORE, 3), (Resource.GRAIN, 4),
+                    (Resource.WOOL, 5), (Resource.BRICK, 5), (Resource.GRAIN, 6), (Resource.WOOL, 11)]
             else:
                 match = p.match(s)
                 if not match:
@@ -170,7 +170,7 @@ Other valid inputs are:
                     if roll is None:
                         print("Invalid dice roll: '{0}'".format(match.group(1)))
                         continue
-                tList.append((resource.name.lower(), roll))
+                tList.append((resource, roll))
 
     def addPlayers(self, colorList):
         for color in colorList:
@@ -184,17 +184,17 @@ Other valid inputs are:
         s = input('Use default ports? (y/n) ').lower()
         if s == 'y':
             for loc in [(2,1),(3,0),(5,0),(6,1),(10,7),(10,9),(2,15),(3,16)]:
-                self.addPort(loc, 'anything')
-            self.addPort((8,3), 'wool')
-            self.addPort((9,4), 'wool')
-            self.addPort((1,4), 'brick')
-            self.addPort((1,6), 'brick')
-            self.addPort((1,10), 'lumber')
-            self.addPort((1,12), 'lumber')
-            self.addPort((9,12), 'ore')
-            self.addPort((8,13), 'ore')
-            self.addPort((5,16), 'grain')
-            self.addPort((6,15), 'grain')
+                self.addPort(loc, Port.ANYTHING)
+            self.addPort((8,3), Port.WOOL)
+            self.addPort((9,4), Port.WOOL)
+            self.addPort((1,4), Port.BRICK)
+            self.addPort((1,6), Port.BRICK)
+            self.addPort((1,10), Port.LUMBER)
+            self.addPort((1,12), Port.LUMBER)
+            self.addPort((9,12), Port.ORE)
+            self.addPort((8,13), Port.ORE)
+            self.addPort((5,16), Port.GRAIN)
+            self.addPort((6,15), Port.GRAIN)
             return
         print("""
 Input the ports in order of clockwise order starting with the top left port. The
@@ -217,7 +217,7 @@ letters in the following map:
                     print("Invalid resource: '{0}'".format(r))
                     continue
                 break
-            self.addPort(l, p.name.lower())
+            self.addPort(l, p)
 
     def payout(self, roll):
         payingNodes = [node for node in self.nodelist.values() if roll in node.returns and node.owner != None]
@@ -313,7 +313,7 @@ letters in the following map:
 
     def printBoard(self):
         print("""                        {}         {}         {}
-                       /       \       /       \       /       \                  
+                       /       \       /       \       /       \
                 {}         {}         {}         {}
                    |               |               |               |
                    |               |               |               |

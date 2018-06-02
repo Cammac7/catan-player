@@ -3,7 +3,6 @@
 from enum import Enum, unique
 from collections import Counter
 import re
-import ast
 import random
 
 
@@ -66,15 +65,23 @@ class Player:
 
 
 def inValLoc(prompt):
-    locPat = re.compile(r"^\(\d{1,2},\d{1,2}\)$")
+    p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
     while True:
-        value = input(prompt)
-        if not locPat.match(value):
-            print("Sorry, format needs to be (x,y)")
+        s = input(prompt)
+        match = p.match(s)
+        if not match:
+            print("Invalid format. Format must be 'x,y'")
             continue
-        else:
-            break
-    return ast.literal_eval(value.replace(',', ', '))
+        x = int(match.group(1))
+        if x < 0 or x > 10:
+            print("Invalid x coordinate. x must be in the range [0, 10].")
+            continue
+        y = int(match.group(2))
+        if y < 0 or y > 16:
+            print("Invalid y coordinate. y must be in the range [0, 16].")
+            continue
+        break
+    return (x, y)
 
 def inValRoll(inroll):
     while True:

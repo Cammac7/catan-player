@@ -42,6 +42,26 @@ def ResourceFromString(s):
             return r
     return None
 
+@unique
+class Port(Enum):
+    ANYTHING = 0
+    BRICK = 1
+    GRAIN = 2
+    LUMBER = 3
+    ORE = 4
+    WOOL = 5
+
+def PortFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Port:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+
 def RollFromString(s):
     r = int(s)
     if r < 2 or r > 12:
@@ -98,9 +118,11 @@ class CatanBoard:
         return iFirst
 
     def buildTileList(self):
-        print("""Input the resources of each of the tiles in order.
-The input format is '<resource> <dice roll>', where dice roll is a number 2-12
-and resource is one of the letters in the following map:
+        print("""~~~ Tiles ~~~
+
+Input the resources of each of the tiles in order (left to right, then top to
+bottom). The input format is '<dice roll><resource>', where dice roll is a
+number 2-12 and resource is one of the letters in the following map:
 
     b   brick
     g   grain
@@ -109,8 +131,8 @@ and resource is one of the letters in the following map:
     w   wool
     d   desert
 
-For example, 'w 10' means the tile has a resource of wool and a dice roll of 10.
-Note: The roll for desert tiles will be ignored.
+For example, '10w' means the tile has a resource of wool and a dice roll of 10.
+Note: The roll is necessary for desert tiles but it will be ignored.
 Other valid inputs are:
 
     build     Finish inputting tiles
@@ -119,7 +141,7 @@ Other valid inputs are:
 
 """)
 
-        p = re.compile(r'(\d+)\s+(\w+)')
+        p = re.compile(r'(\d\d?)\s*(\w+)')
         tList = []
         while True:
             s = input('Next tile: ').strip()
@@ -148,7 +170,6 @@ Other valid inputs are:
                     if roll is None:
                         print("Invalid dice roll: '{0}'".format(match.group(1)))
                         continue
-                print("{0} {1}".format(resource, roll))
                 tList.append((resource.name.lower(), roll))
 
     def addPlayers(self, colorList):
@@ -159,31 +180,44 @@ Other valid inputs are:
         self.nodelist[location].port = portType
 
     def addPorts(self):
-        preset = input("To set default ports, type 'default'. Any other key for custom.  ")
-        if preset == "default":
+        print('\n~~~ Ports ~~~\n')
+        s = input('Use default ports? (y/n) ').lower()
+        if s == 'y':
             for loc in [(2,1),(3,0),(5,0),(6,1),(10,7),(10,9),(2,15),(3,16)]:
-                self.addPort(loc, "ANYTHING")
-            #Sheep
-            self.addPort((8,3),"WOOL")
-            self.addPort((9,4),"WOOL")
-            #BRICK
-            self.addPort((1,4),"BRICK")
-            self.addPort((1,6),"BRICK")
-            #LUMBER
-            self.addPort((1,10),"LUMBER")
-            self.addPort((1,12),"LUMBER")
-            #ORE
-            self.addPort((9,12),"ORE")
-            self.addPort((8,13),"ORE")
-            #GRAIN
-            self.addPort((5,16),"GRAIN")
-            self.addPort((6,15),"GRAIN")
-        else:
-            for i in range(18):
-                location = inValLoc("What's the location of the port node? (x,y)port. OR type 'default' to set default ports ")
-                portType = input("What resource? (BRICK, ORE, ETC. OR ANYTHING)")
-                # TODO gotta make "portType" convert to and check for enum
-                self.addPort(location, portType)
+                self.addPort(loc, 'anything')
+            self.addPort((8,3), 'wool')
+            self.addPort((9,4), 'wool')
+            self.addPort((1,4), 'brick')
+            self.addPort((1,6), 'brick')
+            self.addPort((1,10), 'lumber')
+            self.addPort((1,12), 'lumber')
+            self.addPort((9,12), 'ore')
+            self.addPort((8,13), 'ore')
+            self.addPort((5,16), 'grain')
+            self.addPort((6,15), 'grain')
+            return
+        print("""
+Input the ports in order of clockwise order starting with the top left port. The
+format of the location is "x,y". The format for the resource is is one of the
+letters in the following map:
+
+    b   brick
+    g   grain
+    l   lumber
+    o   ore
+    w   wool
+    a   anything
+""")
+        for i in range(18):
+            l = inValLoc('Location of port? ')
+            while True:
+                r = input('What resource? ')
+                p = PortFromString(r)
+                if p is None:
+                    print("Invalid resource: '{0}'".format(r))
+                    continue
+                break
+            self.addPort(l, p.name.lower())
 
     def payout(self, roll):
         payingNodes = [node for node in self.nodelist.values() if roll in node.returns and node.owner != None]
@@ -280,30 +314,30 @@ Other valid inputs are:
 
     def printBoard(self):
         print("""                       {}         {}         {}
-                      /       \       /       \       /       \                  
+                      /       \       /       \       /       \
                {}         {}         {}         {}
-                  |               |               |               |                 
-                  |               |               |               |                 
+                  |               |               |               |
+                  |               |               |               |
                {}         {}         {}         {}
-              /       \       /       \       /       \       /       \  
+              /       \       /       \       /       \       /       \
        {}         {}         {}         {}         {}
-          |               |               |               |               |        
-          |               |               |               |               |           
+          |               |               |               |               |
+          |               |               |               |               |
        {}         {}         {}         {}         {}
-      /       \       /       \       /       \       /       \       /       \ 
+      /       \       /       \       /       \       /       \       /       \
 {}         {}         {}         {}         {}         {}
-  |                |               |               |               |               |                 
-  |                |               |               |               |               |                 
+  |                |               |               |               |               |
+  |                |               |               |               |               |
 {}         {}         {}         {}         {}         {}
-      \       /       \       /       \       /       \       /       \       / 
+      \       /       \       /       \       /       \       /       \       /
        {}         {}         {}         {}         {}
-          |               |               |               |               |        
-          |               |               |               |               |           
+          |               |               |               |               |
+          |               |               |               |               |
        {}         {}         {}         {}         {}
-              \       /       \       /       \       /       \       /  
+              \       /       \       /       \       /       \       /
                {}         {}         {}         {}
-                  |               |               |               |                 
-                  |               |               |               |                 
+                  |               |               |               |
+                  |               |               |               |
                {}         {}         {}         {}
-                      \       /       \       /       \       /                  
+                      \       /       \       /       \       /
                        {}         {}         {}""".format(self.p((3,16)), self.p((5,16)), self.p((7,16)), self.p((2,15)), self.p((4,15)), self.p((6,15)), self.p((8,15)), self.p((2,13)), self.p((4,13)), self.p((6,13)), self.p((8,13)), self.p((1,12)), self.p((3,12)), self.p((5,12)), self.p((7,12)), self.p((9,12)), self.p((1,10)), self.p((3,10)), self.p((5,10)), self.p((7,10)), self.p((9,10)), self.p((0,9)), self.p((2,9)), self.p((4,9)), self.p((6,9)), self.p((8,9)), self.p((10,9)), self.p((0,7)), self.p((2,7)), self.p((4,7)), self.p((6,7)), self.p((8,7)), self.p((10,7)), self.p((1,6)), self.p((3,6)), self.p((5,6)), self.p((7,6)), self.p((9,6)), self.p((1,4)), self.p((3,4)), self.p((5,4)), self.p((7,4)), self.p((9,4)), self.p((2,3)), self.p((4,3)), self.p((6,3)), self.p((8,3)), self.p((2,1)), self.p((4,1)), self.p((6,1)), self.p((8,1)), self.p((3,0)), self.p((5,0)), self.p((7,0))))

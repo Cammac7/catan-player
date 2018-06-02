@@ -35,7 +35,6 @@ def FromString(s):
 class Player:
     def __init__(self, color):
         self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
-        #self.hand = Counter(Resource.BRICK=4, Resource.LUMBER=4, Resource.WOOL=2, Resource.GRAIN=2)
         self.cards = []  # development cards
         self.color = color  # player color
         self.victoryPoints = 0  # maybe can contain decimals to represent probability

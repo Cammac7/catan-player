@@ -223,9 +223,10 @@ letters in the following map:
     def buildDev(self, color):
         print("build dev card")
         player = self.players[color]
-        #player.hand[]
-        #TODO build dev card
-        # subtract resources, add dev card to hand
+        devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
+        player.hand.subtract(devcard)
+        player.cards.append("UNKNOWN")
+        #TODO Enum for indicating card is unknown?
 
     def addNode(self, location):
         self.nodelist[location] = Node()

@@ -221,7 +221,6 @@ letters in the following map:
             owner.hand[node.returns[roll]] += node.structure
 
     def buildDev(self, color):
-        print("build dev card")
         player = self.players[color]
         devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
         player.hand.subtract(devcard)
@@ -232,7 +231,8 @@ letters in the following map:
         self.nodelist[location] = Node()
 
     def buildSettle(self, color, location):
-        # this needs to use resources
+        settlement = {Resource.BRICK:1, Resource.LUMBER:1, Resource.WOOL:1, Resource.GRAIN:1}
+        player.hand.subtract(settlement)
         selecNode = self.nodelist[location]
         selecNode.owner = color
         selecNode.structure = 1
@@ -240,11 +240,15 @@ letters in the following map:
         player.victoryPoints += 1  # this is faster than running the function
 
     def buildCity(self, location):
+        city = {Resource.ORE:3, Resource.GRAIN:2}
+        player.hand.subtract(city)
         selecNode = self.nodelist[location]
         selecNode.structure = 2
         self.players[selecNode.owner].updateVPs()
 
     def buildRoad(self, color, fromLoc, toLoc):
+        road = {Resource.BRICK:1, Resource.LUMBER:1}
+        player.hand.subtract(city)
         fromNode = self.nodelist[fromLoc]
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color

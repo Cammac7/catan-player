@@ -92,9 +92,9 @@ class CatanBoard:
         self.addPorts()
         # Assign player colors
         players = input(
-            "Enter color of other players in clockwise order, starting to your left "
-            "(comma separated like red,white,orange): ")
-        clrList = players.split(",")
+            "Enter color of other players in clockwise order, starting to my left "
+            "(comma separated like 'red,white,orange'): ")
+        clrList = [c.strip() for c in players.split(",")]
         self.addPlayers(clrList)
         compColor = input("Which color am I playing as? ")
         self.players[compColor] = Computer(compColor)
@@ -109,7 +109,7 @@ class CatanBoard:
             playerIndex += 1
 
     def initialPlacement(self):
-        print("running inital placement")
+        print('\n~~~ Inital placement ~~~\n')
         pFirst = input("Who is first? ")
         iFirst = list(self.players.keys()).index(pFirst)
         for i in range(iFirst, iFirst + ((2 * len(self.players)))):

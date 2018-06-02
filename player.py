@@ -32,12 +32,6 @@ class DevCard(Enum):
     YEAR_OF_PLENTY = 3
     MONOPOLY = 4
 
-    def FromString(s):
-        s = s.upper()
-        for c in DevCard:
-            if c.name == s:
-                return c
-        return False
 
 @unique
 class Color(Enum):

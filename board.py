@@ -6,6 +6,7 @@ from collections import OrderedDict
 from player import *
 
 
+<<<<<<< HEAD
 @unique
 class Card(Enum):
     KNIGHT = 1
@@ -20,6 +21,18 @@ class Card(Enum):
             if c.name == s:
                 return c
         return False
+=======
+def ResourceFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Resource:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+>>>>>>> abec65b09f71bfe3fd6cb88b8133d46313c4d9f4
 
 @unique
 class Port(Enum):
@@ -209,19 +222,10 @@ letters in the following map:
             owner = self.players[node.owner]
             owner.hand[node.returns[roll]] += node.structure
 
-    def buildDev(self, color):
-        print("build dev card")
-        player = self.players[color]
-        devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
-        player.hand.subtract(devcard)
-        player.cards.append("UNKNOWN")
-        #TODO Enum for indicating card is unknown?
-
     def addNode(self, location):
         self.nodelist[location] = Node()
 
     def buildSettle(self, color, location):
-        # this needs to use resources
         selecNode = self.nodelist[location]
         selecNode.owner = color
         selecNode.structure = 1

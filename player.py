@@ -26,6 +26,20 @@ def ResourceFromString(s):
     return None
 
 @unique
+class DevCard(Enum):
+    KNIGHT = 1
+    ROAD_BUILDING = 2
+    YEAR_OF_PLENTY = 3
+    MONOPOLY = 4
+
+    def FromString(s):
+        s = s.upper()
+        for c in DevCard:
+            if c.name == s:
+                return c
+        return False
+
+@unique
 class Color(Enum):
     RED = 1
     BLUE = 2
@@ -68,7 +82,8 @@ def InputResource(prompt):
 class Player:
     def __init__(self, color):
         self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
-        self.cards = []  # development cards
+        self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
+        self.playedCards = []
         self.color = color  # player color
         self.victoryPoints = 0  # maybe can contain decimals to represent probability
         self.longestRoad = False
@@ -154,18 +169,25 @@ class Human(Player):
                 break
         if uprompt == "city":
             loc = inValLoc("What location? (x,y)")
+            city = {Resource.ORE:3, Resource.GRAIN:2}
+            self.hand.subtract(city)
             inboard.buildCity(loc)
         elif uprompt == "settlement":
             loc = inValLoc("What location? (x,y)")
+            settlement = {Resource.BRICK:1, Resource.LUMBER:1, Resource.WOOL:1, Resource.GRAIN:1}
+            self.hand.subtract(settlement)
             inboard.buildSettle(self.color, loc)
         elif uprompt == "road":
             fromL = inValLoc("From which location? (x,y)")
             toL = inValLoc("To which location? (x,y)")
+            road = {Resource.BRICK:1, Resource.LUMBER:1}
+            self.hand.subtract(road)
             inboard.buildRoad(self.color, fromL, toL)
         elif uprompt == "devcard":
-            return True
-            #TODO
-    
+            devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
+            self.hand.subtract(devcard)
+            self.unplayedCards += 1
+
     def trade(self):
         p = re.compile(r'(\d+)\s*(\w+)')
         maritime = False
@@ -186,7 +208,26 @@ class Human(Player):
             nSelf, rSelf = InputResource("What is {} trading? ".format(self.color)
             nThem, rThem = InputResource("What is {} trading? ".format(c.name.lower()))
             # TODO
-            
+
+    def playDevcard():
+        while True:
+            dcard = input("What card? Knight, Road Building, Year of Plenty, or Monopoly: ")
+            if dcard not in ["Knight", "Road Building", "Year of Plenty", "Monopoly"]:
+                print("can only play a Knight, Road Building, Year of Plenty, or Monopoly")
+                continue
+            else:
+                break
+        if dcard == "Knight":
+            self.unplayedCards -= 1
+            self.playedCards.append(DevCard.KNIGHT)
+        elif dcard == "Road Building":
+            for n in range(2):
+                fromL = inValLoc("From which location? (x,y)")
+                toL = inValLoc("To which location? (x,y)")
+                inboard.buildRoad(self.color, fromL, toL)
+#TODO finish other dev cards
+#        elif dcard == "Year of Plenty":
+#        elif dcard == "Monopoly":
 
     def playTurn(self, inboard):
         print("")

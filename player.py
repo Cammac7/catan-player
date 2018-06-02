@@ -13,6 +13,9 @@ class Resource(Enum):
     LUMBER = 3
     ORE = 4
     WOOL = 5
+    
+    def __str__(self):
+        return self.name.lower()
 
 def ResourceFromString(s):
     if not s:
@@ -31,6 +34,9 @@ class DevCard(Enum):
     ROAD_BUILDING = 2
     YEAR_OF_PLENTY = 3
     MONOPOLY = 4
+    
+    def __str__(self):
+        return self.name.lower()
 
 
 @unique
@@ -41,6 +47,9 @@ class Color(Enum):
     WHITE = 4
     BLACK = 5
     GREEN = 6
+    
+    def __str__(self):
+        return self.name.lower()
 
 def ColorFromString(s):
     if not s:
@@ -74,15 +83,16 @@ def InputResource(prompt):
 
 
 class Player:
-    def __init__(self, color):
-        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
+    def __init__(self, color, board):
+        self.color = color  # this player's color
+        self.board = board  # reference to the CatanBoard object
+        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})  # the resources this player has (currently set to a default hand)
         self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
-        self.playedCards = []
-        self.color = color  # player color
+        self.playedCards = []  # played development cards
         self.victoryPoints = 0  # maybe can contain decimals to represent probability
         self.longestRoad = False
         self.largestArmy = False
-        self.remaining = Counter()  # remaining roads, settlements and cities
+        self.remaining = Counter()  # unplayed roads, settlements, and cities that this player has in their inventory
 
     def updateVPs(self):  # do I need this function? could update for each action
         newVP = 0
@@ -127,8 +137,8 @@ def inValRoll(inroll):
 def inAction(prompt):
     while True:
         uprompt = input(prompt)
-        if uprompt not in ["build", "trade", "devcard", "end"]:
-            print("You can only build, trade, play a devcard, or end")
+        if uprompt not in ["build", "trade", "ask", "devcard", "end"]:
+            print("You can only build, trade, ask, play a devcard, or end")
             continue
         else:
             break
@@ -136,24 +146,24 @@ def inAction(prompt):
 
 
 class Human(Player):
-    def __init__(self, color):
-        Player.__init__(self, color)
+    def __init__(self, color, board):
+        Player.__init__(self, color, board)
 
-    def initPlace(self, inboard):
-        validSetts = inboard.validInitSetPlace()
+    def initPlace(self):
+        validSetts = self.board.validInitSetPlace()
         setLoc = inValLoc("Location of Placed Settlement: ")
         while setLoc not in validSetts:
             setLoc = inValLoc("Location of Placed Settlement: ")
-        neighbors = list(inboard.nodelist[setLoc].neighbors.keys())
-        possRoads = [loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors]
+        neighbors = list(self.board.nodelist[setLoc].neighbors.keys())
+        possRoads = [loc for loc in self.board.nodelist if self.board.nodelist[loc] in neighbors]
         print("Possible Road Directions: {}".format(possRoads))
         setRd = inValLoc("Location of road end: ")
         while setRd not in possRoads:
             setRd = inValLoc("Location of road end: ")
-        inboard.buildSettle(self.color, setLoc)
-        inboard.buildRoad(self.color, setLoc, setRd)
+        self.board.buildSettle(self.color, setLoc)
+        self.board.buildRoad(self.color, setLoc, setRd)
 
-    def build(self, inboard):
+    def build(self):
         while True:
             uprompt = input("city, settlement, road, or devcard?: ")
             if uprompt not in ["city", "settlement", "road", "devcard"]:
@@ -165,18 +175,18 @@ class Human(Player):
             loc = inValLoc("What location? (x,y)")
             city = {Resource.ORE:3, Resource.GRAIN:2}
             self.hand.subtract(city)
-            inboard.buildCity(loc)
+            self.board.buildCity(loc)
         elif uprompt == "settlement":
             loc = inValLoc("What location? (x,y)")
             settlement = {Resource.BRICK:1, Resource.LUMBER:1, Resource.WOOL:1, Resource.GRAIN:1}
             self.hand.subtract(settlement)
-            inboard.buildSettle(self.color, loc)
+            self.board.buildSettle(self.color, loc)
         elif uprompt == "road":
             fromL = inValLoc("From which location? (x,y)")
             toL = inValLoc("To which location? (x,y)")
             road = {Resource.BRICK:1, Resource.LUMBER:1}
             self.hand.subtract(road)
-            inboard.buildRoad(self.color, fromL, toL)
+            self.board.buildRoad(self.color, fromL, toL)
         elif uprompt == "devcard":
             devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
             self.hand.subtract(devcard)
@@ -199,7 +209,7 @@ class Human(Player):
             # TODO: Implement maritime trade.
             print("Maritime trade not supported yet.")
         else:
-            nSelf, rSelf = InputResource("What is {} trading? ".format(self.color)
+            nSelf, rSelf = InputResource("What is {} trading? ".format(self.color.name.lower()))
             nThem, rThem = InputResource("What is {} trading? ".format(c.name.lower()))
             # TODO
 
@@ -219,25 +229,26 @@ class Human(Player):
             for n in range(2):
                 fromL = inValLoc("From which location? (x,y)")
                 toL = inValLoc("To which location? (x,y)")
-                inboard.buildRoad(self.color, fromL, toL)
-#TODO finish other dev cards
-#        elif dcard == "Year of Plenty":
-#        elif dcard == "Monopoly":
+                self.board.buildRoad(self.color, fromL, toL)
+        #TODO finish other dev cards
+        # elif dcard == "Year of Plenty":
+        # elif dcard == "Monopoly":
 
-    def playTurn(self, inboard):
+    def playTurn(self):
         print("")
         print("Current Turn: {}".format(self.color))
         roll = inValRoll("What did they roll?: ")
-        inboard.payout(roll)
-        action = inAction("What Action? (build, trade, ask, devcard, end): ")
+        self.board.payout(roll)
+        action = None
         while action != "end":
             action = inAction("What Action? (build, trade, ask, devcard, end): ")
             if action == "build":
-                self.build(inboard)
+                self.build()
             elif action == "trade":
                 self.trade()
             elif action == "ask":
                 # TODO
+                pass
             elif action == "devcard":
                 self.playDevcard()
             #TODO add check board state for longest road/largest army. (and winner?)
@@ -245,21 +256,22 @@ class Human(Player):
 
 
 class Computer(Player):
-    def __init__(self, color):
-        Player.__init__(self, color)
+    def __init__(self, color, board):
+        Player.__init__(self, color, board)
 
-    def initPlace(self, inboard):
+    def initPlace(self):
         # TODO: Make this a real function. Currently does random selection
-        validSetts = inboard.validInitSetPlace()
+        validSetts = self.board.validInitSetPlace()
         print("BEEP BOOP BEEP BOOP")
         print("A.A.R.O.N. IS THINKING")
         print("A.A.R.O.N. Completed Initial Placement")
         nodeChoice = random.choice(validSetts)
-        neighbors = list(inboard.nodelist[nodeChoice].neighbors.keys())
-        possRoads = [loc for loc in inboard.nodelist if inboard.nodelist[loc] in neighbors]
+        neighbors = list(self.board.nodelist[nodeChoice].neighbors.keys())
+        possRoads = [loc for loc in self.board.nodelist if self.board.nodelist[loc] in neighbors]
         roadChoice = random.choice(possRoads)
-        inboard.buildSettle(self.color, nodeChoice)
-        inboard.buildRoad(self.color, nodeChoice, roadChoice)
+        self.board.buildSettle(self.color, nodeChoice)
+        self.board.buildRoad(self.color, nodeChoice, roadChoice)
 
-    def playTurn(self, inboard):  # TODO: Need to implement
-        return True
+    def playTurn(self):
+        # TODO: Need to implement
+        pass

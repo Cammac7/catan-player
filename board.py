@@ -13,6 +13,9 @@ class Port(Enum):
     LUMBER = 3
     ORE = 4
     WOOL = 5
+    
+    def __str__(self):
+        return self.name.lower()
 
 def PortFromString(s):
     if not s:
@@ -49,36 +52,30 @@ class CatanBoard:
         self.deck = []  # stack of dev cards
         self.winner = False
 
+    def player(self, color):
+        return self.players[color]
+
     def play(self):
-        # Setup
         self.setTerrain(self.buildTileList())
         self.addPorts()
-        # Assign player colors
-        players = input(
-            "Enter color of other players in clockwise order, starting to my left "
-            "(comma separated like 'red,white,orange'): ")
-        clrList = [c.strip() for c in players.split(",")]
-        self.addPlayers(clrList)
-        compColor = input("Which color am I playing as? ")
-        self.players[compColor] = Computer(compColor)
+        self.addPlayers()
         playerIndex = self.initialPlacement()
-        print("Finished Initial Placement")
-        # TODO Added playing of each turn
+        print('\n~~~ Start game ~~~\n')
         while not self.winner:
-            current_player = list(self.players.values())[
-                playerIndex % len(self.players)]
             self.printBoard()
-            current_player.playTurn(self)
+            p = list(self.players.values())[playerIndex % len(self.players)]
+            p.playTurn()
             playerIndex += 1
 
     def initialPlacement(self):
         print('\n~~~ Inital placement ~~~\n')
-        pFirst = input("Who is first? ")
-        iFirst = list(self.players.keys()).index(pFirst)
+        s = input("Who is first? ")
+        c = ColorFromString(s.strip())
+        iFirst = list(self.players.keys()).index(c)
         for i in range(iFirst, iFirst + ((2 * len(self.players)))):
-            current_player = list(self.players.values())[i % len(self.players)]
-            print("Current Turn: Player {}".format(current_player.color))
-            current_player.initPlace(self)
+            p = list(self.players.values())[i % len(self.players)]
+            print("Current Turn: Player {}".format(p.color))
+            p.initPlace()
         return iFirst
 
     def buildTileList(self):
@@ -136,9 +133,17 @@ Other valid inputs are:
                         continue
                 tList.append((resource, roll))
 
-    def addPlayers(self, colorList):
-        for color in colorList:
-            self.players[color] = Human(color)
+    def addPlayers(self):
+        print('\n~~~ Players ~~~\n')
+        s = input(
+            "Enter color of other players in clockwise order, starting to my left "
+            "(comma separated like 'red,white,orange'): ")
+        colors = [ColorFromString(c.strip()) for c in s.split(",")]
+        for c in colors:
+            self.players[c] = Human(c, self)
+        s = input("Which color am I playing as? ")
+        c = ColorFromString(s.strip())
+        self.players[c] = Computer(c, self)
 
     def addPort(self, location, portType):
         self.nodelist[location].port = portType
@@ -190,8 +195,8 @@ letters in the following map:
         for node in payingNodes:
             print(node.owner)
             print(node.returns)
-            owner = self.players[node.owner]
-            owner.hand[node.returns[roll]] += node.structure
+            p = self.players[node.owner]
+            p.hand[node.returns[roll]] += node.structure
 
     def addNode(self, location):
         self.nodelist[location] = Node()
@@ -213,18 +218,6 @@ letters in the following map:
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color
         toNode.neighbors[fromNode] = color
-
-    def p(self, s):
-        x = s[0]
-        y = s[1]
-        node = self.nodelist[s]
-        if node.owner == None:
-            return "({:>2},{:>2})".format(x,y)
-        else:
-            ow = node.owner[:1]
-            if node.structure == 2:
-                ow = ow.upper()
-                return "(  {}  )".format(ow)
 
     def validInitSetPlace(self):
         openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
@@ -265,7 +258,7 @@ letters in the following map:
         if node.owner == None:
             return "({:>2},{:>2})".format(x,y)
         else:
-            ow = node.owner[:1]
+            ow = node.owner.name.lower()[:1]
             if node.structure == 2:
                 ow = ow.upper()
             return "(  {}  )".format(ow)

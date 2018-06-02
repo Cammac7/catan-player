@@ -21,17 +21,6 @@ class Card(Enum):
                 return c
         return False
 
-def ResourceFromString(s):
-    if not s:
-        return None
-    s = s.upper()
-    for r in Resource:
-        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
-        # 'wOoL', etc.) or the first letter ('w' for WOOL).
-        if r.name == s or r.name[0] == s[0]:
-            return r
-    return None
-
 @unique
 class Port(Enum):
     ANYTHING = 0

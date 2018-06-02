@@ -14,22 +14,55 @@ class Resource(Enum):
     ORE = 4
     WOOL = 5
 
+def ResourceFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Resource:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+
 @unique
-class PlayerColors(Enum):
+class Color(Enum):
     RED = 1
     BLUE = 2
     ORANGE = 3
     WHITE = 4
     BLACK = 5
     GREEN = 6
-    BANK = 7
 
-def FromString(s):
+def ColorFromString(s):
+    if not s:
+        return None
     s = s.upper()
-    for c in PlayerColors:
-        if c.name == s:
-            return c
-    return False
+    for r in Color:
+        # We accept the full name with any capitalization (e.g. 'red', 'RED',
+        # 'ReD', etc.).
+        if r.name == s:
+            return r
+    return None
+
+def InputResource(prompt):
+    p = re.compile(r'(\d+)\s*(\w+)')
+    while True:
+        s = input(prompt)
+        match = p.match(s)
+        if not match:
+            print("Invalid resource format. Expected '<number><resource>' (like '4w' for 4 wool).")
+            continue
+        n = int(match.group(1))
+        if n < 0:
+            print("Invalid number: '{}'".format(match.group(1)))
+            continue
+        r = ResourceFromString(match.group(2))
+        if r is None or r == Resource.DESERT:
+            print("Invalid resource: '{}'".format(match.group(2)))
+            continue
+        break
+    return (n, r)
 
 
 class Player:
@@ -132,20 +165,43 @@ class Human(Player):
         elif uprompt == "devcard":
             return True
             #TODO
+    
+    def trade(self):
+        p = re.compile(r'(\d+)\s*(\w+)')
+        maritime = False
+        while True:
+            s = input("Who is {} trading with (enter 'maritime' for maritime trades)? ".format(self.color)).strip()
+            if s.lower() == "maritime":
+                maritime = True
+                break
+            c = ColorFromString(s)
+            if c is None:
+                print("Invalid color.")
+                continue
+            break
+        if maritime:
+            # TODO: Implement maritime trade.
+            print("Maritime trade not supported yet.")
+        else:
+            nSelf, rSelf = InputResource("What is {} trading? ".format(self.color)
+            nThem, rThem = InputResource("What is {} trading? ".format(c.name.lower()))
+            # TODO
+            
 
     def playTurn(self, inboard):
         print("")
         print("Current Turn: {}".format(self.color))
         roll = inValRoll("What did they roll?: ")
         inboard.payout(roll)
-        action = inAction("What Action? (build, trade, devcard, end): ")
+        action = inAction("What Action? (build, trade, ask, devcard, end): ")
         while action != "end":
-            action = inAction("What Action? (build, trade, devcard, end): ")
+            action = inAction("What Action? (build, trade, ask, devcard, end): ")
             if action == "build":
                 self.build()
             elif action == "trade":
                 self.trade()
-                #TODO MAKE TRADE FUNCTION
+            elif action == "ask":
+                # TODO
             elif action == "devcard":
                 self.playDevcard()
         print("Ending Turn")

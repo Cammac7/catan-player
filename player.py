@@ -220,6 +220,7 @@ class Human(Player):
         if dcard == "Knight":
             self.unplayedCards -= 1
             self.playedCards.append(DevCard.KNIGHT)
+            #TODO add robber moves
         elif dcard == "Road Building":
             for n in range(2):
                 fromL = inValLoc("From which location? (x,y)")
@@ -245,6 +246,7 @@ class Human(Player):
                 # TODO
             elif action == "devcard":
                 self.playDevcard()
+            #TODO add check board state for longest road/largest army. (and winner?)
         print("Ending Turn")
 
 

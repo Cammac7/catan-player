@@ -5,35 +5,6 @@ from enum import Enum, unique
 from collections import OrderedDict
 from player import *
 
-
-<<<<<<< HEAD
-@unique
-class Card(Enum):
-    KNIGHT = 1
-    RESOURCE = 2
-    ROAD_BUILDING = 3
-    YEAR_OF_PLENTY = 4
-    MONOPOLY = 5
-
-    def FromString(s):
-        s = s.upper()
-        for c in Card:
-            if c.name == s:
-                return c
-        return False
-=======
-def ResourceFromString(s):
-    if not s:
-        return None
-    s = s.upper()
-    for r in Resource:
-        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
-        # 'wOoL', etc.) or the first letter ('w' for WOOL).
-        if r.name == s or r.name[0] == s[0]:
-            return r
-    return None
->>>>>>> abec65b09f71bfe3fd6cb88b8133d46313c4d9f4
-
 @unique
 class Port(Enum):
     ANYTHING = 0

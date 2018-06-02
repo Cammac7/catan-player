@@ -161,7 +161,7 @@ class Human(Player):
 
     def build(self, inboard):
         while True:
-            uprompt = input("city, settlement, road, or devcard")
+            uprompt = input("city, settlement, road, or devcard?: ")
             if uprompt not in ["city", "settlement", "road", "devcard"]:
                 print("can only build a city, settlement, road, or devcard")
                 continue
@@ -238,7 +238,7 @@ class Human(Player):
         while action != "end":
             action = inAction("What Action? (build, trade, ask, devcard, end): ")
             if action == "build":
-                self.build()
+                self.build(inboard)
             elif action == "trade":
                 self.trade()
             elif action == "ask":

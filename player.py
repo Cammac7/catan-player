@@ -5,6 +5,14 @@ from collections import Counter
 import re
 import random
 
+@unique
+class Resource(Enum):
+    DESERT = 0
+    BRICK = 1
+    GRAIN = 2
+    LUMBER = 3
+    ORE = 4
+    WOOL = 5
 
 @unique
 class PlayerColors(Enum):
@@ -16,17 +24,18 @@ class PlayerColors(Enum):
     GREEN = 6
     BANK = 7
 
-    def FromString(s):
-        s = s.upper()
-        for c in PlayerColors:
-            if c.name == s:
-                return c
-        return False
+def FromString(s):
+    s = s.upper()
+    for c in PlayerColors:
+        if c.name == s:
+            return c
+    return False
 
 
 class Player:
     def __init__(self, color):
-        self.hand = Counter()  # resouce cards (initialized to 4 brick, 4 wood, 2 wool, 2 grain)
+        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
+        #self.hand = Counter(Resource.BRICK=4, Resource.LUMBER=4, Resource.WOOL=2, Resource.GRAIN=2)
         self.cards = []  # development cards
         self.color = color  # player color
         self.victoryPoints = 0  # maybe can contain decimals to represent probability
@@ -77,7 +86,7 @@ def inValRoll(inroll):
 def inAction(prompt):
     while True:
         uprompt = input(prompt)
-        if uprompt not in ["build", "trade", "devcard", "end"]
+        if uprompt not in ["build", "trade", "devcard", "end"]:
             print("You can only build, trade, play a devcard, or end")
             continue
         else:
@@ -122,6 +131,7 @@ class Human(Player):
             toL = inValLoc("To which location? (x,y)")
             inboard.buildRoad(self.color, fromL, toL)
         elif uprompt == "devcard":
+            return True
             #TODO
 
     def playTurn(self, inboard):

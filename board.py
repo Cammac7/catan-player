@@ -21,16 +21,6 @@ class Card(Enum):
                 return c
         return False
 
-
-@unique
-class Resource(Enum):
-    DESERT = 0
-    BRICK = 1
-    GRAIN = 2
-    LUMBER = 3
-    ORE = 4
-    WOOL = 5
-
 def ResourceFromString(s):
     if not s:
         return None
@@ -232,6 +222,8 @@ letters in the following map:
 
     def buildDev(self, color):
         print("build dev card")
+        player = self.players[color]
+        #player.hand[]
         #TODO build dev card
         # subtract resources, add dev card to hand
 
@@ -315,17 +307,17 @@ letters in the following map:
 
     def printBoard(self):
         print("""                        {}         {}         {}
-                       /       \       /       \       /       \
+                       /       \       /       \       /       \ 
                 {}         {}         {}         {}
                    |               |               |               |
                    |               |               |               |
                 {}         {}         {}         {}
-               /       \       /       \       /       \       /       \
+               /       \       /       \       /       \       /       \ 
         {}         {}         {}         {}         {}
            |               |               |               |               |
            |               |               |               |               |
         {}         {}         {}         {}         {}
-       /       \       /       \       /       \       /       \       /       \
+       /       \       /       \       /       \       /       \       /       \ 
 {}         {}         {}         {}         {}         {}
   |                |               |               |               |               |
   |                |               |               |               |               |

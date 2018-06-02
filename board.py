@@ -6,21 +6,6 @@ from collections import OrderedDict
 from player import *
 
 
-@unique
-class Card(Enum):
-    KNIGHT = 1
-    RESOURCE = 2
-    ROAD_BUILDING = 3
-    YEAR_OF_PLENTY = 4
-    MONOPOLY = 5
-
-    def FromString(s):
-        s = s.upper()
-        for c in Card:
-            if c.name == s:
-                return c
-        return False
-
 def ResourceFromString(s):
     if not s:
         return None
@@ -220,19 +205,10 @@ letters in the following map:
             owner = self.players[node.owner]
             owner.hand[node.returns[roll]] += node.structure
 
-    def buildDev(self, color):
-        player = self.players[color]
-        devcard = {Resource.ORE:1, Resource.GRAIN:1, Resource.WOOL:1}
-        player.hand.subtract(devcard)
-        player.cards.append("UNKNOWN")
-        #TODO Enum for indicating card is unknown?
-
     def addNode(self, location):
         self.nodelist[location] = Node()
 
     def buildSettle(self, color, location):
-        settlement = {Resource.BRICK:1, Resource.LUMBER:1, Resource.WOOL:1, Resource.GRAIN:1}
-        player.hand.subtract(settlement)
         selecNode = self.nodelist[location]
         selecNode.owner = color
         selecNode.structure = 1
@@ -240,15 +216,11 @@ letters in the following map:
         player.victoryPoints += 1  # this is faster than running the function
 
     def buildCity(self, location):
-        city = {Resource.ORE:3, Resource.GRAIN:2}
-        player.hand.subtract(city)
         selecNode = self.nodelist[location]
         selecNode.structure = 2
         self.players[selecNode.owner].updateVPs()
 
     def buildRoad(self, color, fromLoc, toLoc):
-        road = {Resource.BRICK:1, Resource.LUMBER:1}
-        player.hand.subtract(city)
         fromNode = self.nodelist[fromLoc]
         toNode = self.nodelist[toLoc]
         fromNode.neighbors[toNode] = color

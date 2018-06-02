@@ -45,25 +45,6 @@ class Player:
                 newVP += 2
         self.victoryPoints = newVP
 
-    def buildRoad(self):
-        color = input("Which color player?")
-        fromL = inValLoc("From which location? (x,y)")
-        toL = inValLoc("To which location? (x,y)")
-        self.buildRoad(color, fromL, toL)
-
-    def buildCity(self):
-        loc = inValLoc("What location? (x,y)")
-        self.buildCity(loc)
-
-    def buildDev(self):
-        color = input("Which color player?")
-
-    def buildSettle(self):
-        color = input("Which color player?")
-        loc = inValLoc("What location? (x,y)")
-        self.buildSettle(color, loc)
-
-
 def inValLoc(prompt):
     p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
     while True:
@@ -93,6 +74,17 @@ def inValRoll(inroll):
             break
     return roll
 
+def inAction(prompt):
+    while True:
+        uprompt = input(prompt)
+        if uprompt not in ["build", "trade", "devcard", "end"]
+            print("You can only build, trade, play a devcard, or end")
+            continue
+        else:
+            break
+    return uprompt
+
+
 class Human(Player):
     def __init__(self, color):
         Player.__init__(self, color)
@@ -111,11 +103,43 @@ class Human(Player):
         inboard.buildSettle(self.color, setLoc)
         inboard.buildRoad(self.color, setLoc, setRd)
 
+    def build(self, inboard):
+        while True:
+            uprompt = input("city, settlement, road, or devcard")
+            if uprompt not in ["city", "settlement", "road", "devcard"]:
+                print("can only build a city, settlement, road, or devcard")
+                continue
+            else:
+                break
+        if uprompt == "city":
+            loc = inValLoc("What location? (x,y)")
+            inboard.buildCity(loc)
+        elif uprompt == "settlement":
+            loc = inValLoc("What location? (x,y)")
+            inboard.buildSettle(self.color, loc)
+        elif uprompt == "road":
+            fromL = inValLoc("From which location? (x,y)")
+            toL = inValLoc("To which location? (x,y)")
+            inboard.buildRoad(self.color, fromL, toL)
+        elif uprompt == "devcard":
+            #TODO
+
     def playTurn(self, inboard):
         print("")
         print("Current Turn: {}".format(self.color))
         roll = inValRoll("What did they roll?: ")
         inboard.payout(roll)
+        action = inAction("What Action? (build, trade, devcard, end): ")
+        while action != "end":
+            action = inAction("What Action? (build, trade, devcard, end): ")
+            if action == "build":
+                self.build()
+            elif action == "trade":
+                self.trade()
+                #TODO MAKE TRADE FUNCTION
+            elif action == "devcard":
+                self.playDevcard()
+        print("Ending Turn")
 
 
 class Computer(Player):

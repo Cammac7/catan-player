@@ -75,6 +75,7 @@ class Node:
         self.port = None  # port type or None
         self.returns = {}  # dict of num:resource, or probability of resource
         self.neighbors = {}  # {neighborNode:edgeColor}
+        #TODO add "isRobbered" boolean property
 
 
 class CatanBoard:
@@ -111,7 +112,7 @@ class CatanBoard:
         print("running inital placement")
         pFirst = input("Who is first? ")
         iFirst = list(self.players.keys()).index(pFirst)
-        for i in range(iFirst, iFirst + ((2 * len(self.players)) - 1)):
+        for i in range(iFirst, iFirst + ((2 * len(self.players)))):
             current_player = list(self.players.values())[i % len(self.players)]
             print("Current Turn: Player {}".format(current_player.color))
             current_player.initPlace(self)
@@ -220,8 +221,8 @@ letters in the following map:
             self.addPort(l, p.name.lower())
 
     def payout(self, roll):
+        #TODO account for Robber
         payingNodes = [node for node in self.nodelist.values() if roll in node.returns and node.owner != None]
-        #payingNodes = [node for node in self.nodelist.values()]
         print("Paying nodes: {}".format(payingNodes))
         for node in payingNodes:
             print(node.owner)
@@ -231,6 +232,7 @@ letters in the following map:
 
     def buildDev(self, color):
         print("build dev card")
+        #TODO build dev card
         # subtract resources, add dev card to hand
 
     def addNode(self, location):

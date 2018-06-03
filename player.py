@@ -62,7 +62,7 @@ def ColorFromString(s):
             return r
     return None
 
-def InputResource(prompt):
+def inResource(prompt):
     p = re.compile(r'(\d+)\s*(\w+)')
     while True:
         s = input(prompt)
@@ -80,30 +80,6 @@ def InputResource(prompt):
             continue
         break
     return (n, r)
-
-
-class Player:
-    def __init__(self, color, board):
-        self.color = color  # this player's color
-        self.board = board  # reference to the CatanBoard object
-        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})  # the resources this player has (currently set to a default hand)
-        self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
-        self.playedCards = []  # played development cards
-        self.victoryPoints = 0  # maybe can contain decimals to represent probability
-        self.longestRoad = False
-        self.largestArmy = False
-        self.remaining = Counter()  # unplayed roads, settlements, and cities that this player has in their inventory
-
-    def updateVPs(self):  # do I need this function? could update for each action
-        newVP = 0
-        for node in self.nodes.values():
-            newVP += node.structure
-        for card in self.cards:
-            if card == 'VP':
-                newVP += 1
-            elif card == 'Longest Road' or card == 'Largest Army':
-                newVP += 2
-        self.victoryPoints = newVP
 
 def inValLoc(prompt):
     p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
@@ -143,6 +119,30 @@ def inAction(prompt):
         else:
             break
     return uprompt
+
+
+class Player:
+    def __init__(self, color, board):
+        self.color = color  # this player's color
+        self.board = board  # reference to the CatanBoard object
+        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})  # the resources this player has (currently set to a default hand)
+        self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
+        self.playedCards = []  # played development cards
+        self.victoryPoints = 0  # maybe can contain decimals to represent probability
+        self.longestRoad = False
+        self.largestArmy = False
+        self.remaining = Counter()  # unplayed roads, settlements, and cities that this player has in their inventory
+
+    def updateVPs(self):  # do I need this function? could update for each action
+        newVP = 0
+        for node in self.nodes.values():
+            newVP += node.structure
+        for card in self.cards:
+            if card == 'VP':
+                newVP += 1
+            elif card == 'Longest Road' or card == 'Largest Army':
+                newVP += 2
+        self.victoryPoints = newVP
 
 
 class Human(Player):
@@ -209,8 +209,8 @@ class Human(Player):
             # TODO: Implement maritime trade.
             print("Maritime trade not supported yet.")
         else:
-            nSelf, rSelf = InputResource("What is {} trading? ".format(self.color.name.lower()))
-            nThem, rThem = InputResource("What is {} trading? ".format(c.name.lower()))
+            nSelf, rSelf = inResource("What is {} trading? ".format(self.color.name.lower()))
+            nThem, rThem = inResource("What is {} trading? ".format(c.name.lower()))
             # TODO
 
     def playDevcard():

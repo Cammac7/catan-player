@@ -265,7 +265,7 @@ class Human(Player):
             self.playedCards.append(DevCard.KNIGHT)
             #TODO add robber moves
         elif dcard == "Road Building":
-            for n in range(2):
+            for n in range(3):
                 print("Segment {}/3".format(n+1))
                 fromL = inValLoc("From which location? (x,y)")
                 toL = inValLoc("To which location? (x,y)")

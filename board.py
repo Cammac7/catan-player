@@ -6,6 +6,32 @@ from collections import OrderedDict
 from player import *
 
 @unique
+class Card(Enum):
+    KNIGHT = 1
+    RESOURCE = 2
+    ROAD_BUILDING = 3
+    YEAR_OF_PLENTY = 4
+    MONOPOLY = 5
+
+    def FromString(s):
+        s = s.upper()
+        for c in Card:
+            if c.name == s:
+                return c
+        return False
+
+def ResourceFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Resource:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+
+@unique
 class Port(Enum):
     ANYTHING = 0
     BRICK = 1
@@ -190,13 +216,18 @@ letters in the following map:
 
     def payout(self, roll):
         #TODO account for Robber
-        payingNodes = [node for node in self.nodelist.values() if roll in node.returns and node.owner != None]
-        print("Paying nodes: {}".format(payingNodes))
-        for node in payingNodes:
-            print(node.owner)
-            print(node.returns)
-            p = self.players[node.owner]
-            p.hand[node.returns[roll]] += node.structure
+        payingLocs = [loc for loc in self.nodelist if roll in self.nodelist[loc].returns and self.nodelist[loc].owner != None]
+        if len(payingLocs) > 0:
+            print("\nPAYOUTS")
+            print("Node\tOwner\tPayout")
+            payingNodes = [self.nodelist[loc] for loc in payingLocs]
+            for l in payingLocs:
+                node = self.nodelist[l]
+                print("{}\t{}\t{} {}".format(l,node.owner,node.structure,node.returns[roll]))
+                owner = self.players[node.owner]
+                owner.hand[node.returns[roll]] += node.structure
+        else:
+            print("No Payout")
 
     def addNode(self, location):
         self.nodelist[location] = Node()
@@ -211,8 +242,10 @@ letters in the following map:
     def buildCity(self, location):
         selecNode = self.nodelist[location]
         selecNode.structure = 2
-        self.players[selecNode.owner].updateVPs()
-
+        pColor = selecNode.owner
+        player = self.players[pColor]
+        player.victoryPoints += 1
+        
     def buildRoad(self, color, fromLoc, toLoc):
         fromNode = self.nodelist[fromLoc]
         toNode = self.nodelist[toLoc]

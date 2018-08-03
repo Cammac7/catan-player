@@ -81,6 +81,30 @@ def inResource(prompt):
         break
     return (n, r)
 
+class Player:
+    def __init__(self, color):
+        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
+        self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
+        self.playedCards = []
+        self.color = color  # player color
+        self.victoryPoints = 0  # maybe can contain decimals to represent probability
+        self.longestRoad = False
+        self.largestArmy = False
+        self.remaining = Counter()  # remaining roads, settlements and cities
+
+    def updateVPs(self):  # do I need this function? could update for each action
+        newVP = 0
+        for node in self.nodes.values():
+            newVP += node.structure
+        for card in self.playedCards:
+            if card == 'VP':
+                newVP += 1
+        if self.longestRoad:
+            newVP += 2
+        if self.largestArmy:
+            newVP += 2
+        self.victoryPoints = newVP
+
 def inValLoc(prompt):
     p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
     while True:
@@ -201,19 +225,34 @@ class Human(Player):
                 maritime = True
                 break
             c = ColorFromString(s)
-            if c is None:
+            if c is None or c not in self.board.players:
                 print("Invalid color.")
                 continue
             break
         if maritime:
-            # TODO: Implement maritime trade.
-            print("Maritime trade not supported yet.")
+            port = False
+            s = input('Is the trade at a port? i.e 3:1. (y/n) ').lower()
+            giving = ResourceFromString(input("What is {} trading? (b/g/l/o/w): ".format(self.color)))
+            getting = ResourceFromString(input("What is {} receiving? (b/g/l/o/w): ".format(self.color)))
+            if s == "y":
+                self.hand.subtract({giving:3})
+                self.hand += {getting:1}
+            else:
+                self.hand.subtract({giving:4})
+                self.hand += {getting:1}
         else:
-            nSelf, rSelf = inResource("What is {} trading? ".format(self.color.name.lower()))
+            nSelf, rSelf = inResource("What is {} trading? ".format(self.color))
             nThem, rThem = inResource("What is {} trading? ".format(c.name.lower()))
+            otherPlayer = self.board.players[c]
+            giving = {rSelf:nSelf}
+            getting = {rThem:nThem}
+            self.hand.subtract(giving)
+            self.hand += getting
+            otherPlayer.hand.subtract(getting)
+            otherPlayer.hand += giving
             # TODO
 
-    def playDevcard():
+    def playDevcard(self):
         while True:
             dcard = input("What card? Knight, Road Building, Year of Plenty, or Monopoly: ")
             if dcard not in ["Knight", "Road Building", "Year of Plenty", "Monopoly"]:
@@ -227,6 +266,7 @@ class Human(Player):
             #TODO add robber moves
         elif dcard == "Road Building":
             for n in range(2):
+                print("Segment {}/3".format(n+1))
                 fromL = inValLoc("From which location? (x,y)")
                 toL = inValLoc("To which location? (x,y)")
                 self.board.buildRoad(self.color, fromL, toL)
@@ -239,19 +279,16 @@ class Human(Player):
         print("Current Turn: {}".format(self.color))
         roll = inValRoll("What did they roll?: ")
         self.board.payout(roll)
-        action = None
+        action = inAction("What Action? (build, trade, devcard, end): ")
         while action != "end":
-            action = inAction("What Action? (build, trade, ask, devcard, end): ")
             if action == "build":
                 self.build()
             elif action == "trade":
                 self.trade()
-            elif action == "ask":
-                # TODO
-                pass
             elif action == "devcard":
                 self.playDevcard()
             #TODO add check board state for longest road/largest army. (and winner?)
+            action = inAction("What Action? (build, trade, devcard, end): ")
         print("Ending Turn")
 
 

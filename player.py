@@ -5,6 +5,8 @@ from collections import Counter
 import re
 import random
 
+#TODO need to implement robber 
+
 @unique
 class Resource(Enum):
     DESERT = 0

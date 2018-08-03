@@ -64,6 +64,7 @@ def ColorFromString(s):
 
 def inResource(prompt):
     p = re.compile(r'(\d+)\s*(\w+)')
+    #TODO I think we should allow this to take JUST a resource (i.e. assume number is zero if none given)
     while True:
         s = input(prompt)
         match = p.match(s)
@@ -86,7 +87,7 @@ class Player:
         self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
         self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
         self.playedCards = []
-        self.color = color  # player color
+        self.color = color  # player color #TODO change this to ColorFromString(color) [will be repurcussions]
         self.victoryPoints = 0  # maybe can contain decimals to represent probability
         self.longestRoad = False
         self.largestArmy = False
@@ -220,7 +221,7 @@ class Human(Player):
         p = re.compile(r'(\d+)\s*(\w+)')
         maritime = False
         while True:
-            s = input("Who is {} trading with (enter 'maritime' for maritime trades)? ".format(self.color)).strip()
+            s = input("Who is {} trading with (enter 'maritime' for maritime trades)?: ".format(self.color)).strip()
             if s.lower() == "maritime":
                 maritime = True
                 break
@@ -241,8 +242,8 @@ class Human(Player):
                 self.hand.subtract({giving:4})
                 self.hand += {getting:1}
         else:
-            nSelf, rSelf = inResource("What is {} trading? ".format(self.color))
-            nThem, rThem = inResource("What is {} trading? ".format(c.name.lower()))
+            nSelf, rSelf = inResource("What is {} trading?: ".format(self.color))
+            nThem, rThem = inResource("What is {} trading?: ".format(c.name.lower()))
             otherPlayer = self.board.players[c]
             giving = {rSelf:nSelf}
             getting = {rThem:nThem}
@@ -267,12 +268,30 @@ class Human(Player):
         elif dcard == "Road Building":
             for n in range(3):
                 print("Segment {}/3".format(n+1))
-                fromL = inValLoc("From which location? (x,y)")
-                toL = inValLoc("To which location? (x,y)")
+                fromL = inValLoc("From which location? (x,y): ")
+                toL = inValLoc("To which location? (x,y): ")
                 self.board.buildRoad(self.color, fromL, toL)
-        #TODO finish other dev cards
-        # elif dcard == "Year of Plenty":
-        # elif dcard == "Monopoly":
+        elif dcard == "Year of Plenty":
+            num, resource = inResource("Which resource was selected?: ")
+            while True:
+                if num == 1:
+                    self.hand += {resource:num}
+                    num, resource = inResource("Which resource was selected?: ")
+                    self.hand += {resource:num}
+                    break
+                elif num == 2:
+                    self.hand += {resource:num}
+                    break
+                else:
+                    continue
+        elif dcard == "Monopoly":
+            num, resource = inResource("Which resource was selected?: ")
+            for player in self.board.players.values():
+                if player != self:
+                    amount = player.hand[resource]
+                    self.hand += {resource:amount}
+                    player.hand[resource] = 0   
+        #TODO "We should make these Enums" - Mark Langer probably
 
     def playTurn(self):
         print("")

@@ -1,3 +1,109 @@
+import re
+
+def ResourceFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Resource:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+
+def ColorFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Color:
+        # We accept the full name with any capitalization (e.g. 'red', 'RED',
+        # 'ReD', etc.).
+        if r.name == s:
+            return r
+    return None
+
+def PortFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Port:
+        # We accept the full name with any capitalization (e.g. 'wool', 'WOOL',
+        # 'wOoL', etc.) or the first letter ('w' for WOOL).
+        if r.name == s or r.name[0] == s[0]:
+            return r
+    return None
+
+def RollFromString(s):
+    r = int(s)
+    if r < 2 or r > 12:
+        return None
+    return r
+
+def inResource(prompt):
+    p = re.compile(r'(\d+)\s*(\w+)')
+    #TODO I think we should allow this to take JUST a resource (i.e. assume number is zero if none given)
+    while True:
+        s = input(prompt)
+        match = p.match(s)
+        if not match:
+            print("Invalid resource format. Expected '<number><resource>' (like '4w' for 4 wool).")
+            continue
+        n = int(match.group(1))
+        if n < 0:
+            print("Invalid number: '{}'".format(match.group(1)))
+            continue
+        r = ResourceFromString(match.group(2))
+        if r is None or r == Resource.DESERT:
+            print("Invalid resource: '{}'".format(match.group(2)))
+            continue
+        return (n, r)
+
+def inValLoc(prompt):
+    p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
+    while True:
+        s = input(prompt)
+        match = p.match(s)
+        if not match:
+            print("Invalid format. Format must be 'x,y'")
+            continue
+        x = int(match.group(1))
+        if x < 0 or x > 10:
+            print("Invalid x coordinate. x must be in the range [0, 10].")
+            continue
+        y = int(match.group(2))
+        if y < 0 or y > 16:
+            print("Invalid y coordinate. y must be in the range [0, 16].")
+            continue
+        return (x, y)
+
+def inValRoll(prompt):
+    while True:
+        s = input(prompt).strip()
+        # TODO: Don't crash if we can't cast the roll to an int.
+        roll = int(s)
+        if roll < 2 or roll > 12:
+            print("Invalid dice roll. Must be in the range [2, 12].")
+            continue
+        return roll
+
+def inAction(prompt):
+    while True:
+        s = input(prompt).strip().lower()
+        if s not in ["build", "trade", "devcard", "end"]:
+            print("Invalid action. You can only build, trade, play a devcard, or end.")
+            continue
+        # TODO: Return an enum.
+        return s
+
+def inPlayerColor(prompt, validColors):
+    while True:
+        s = input(prompt).strip()
+        c = ColorFromString(s)
+        if c is None or c not in validColors:
+            print("Invalid color.")
+            continue
+        return c
+
 def roll(self):
     roll = inValRoll("What did they roll?: ")
     if roll != 7:

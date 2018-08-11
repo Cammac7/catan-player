@@ -5,6 +5,9 @@ class StateMachine():
         initialState = CatanBoard()
         setTerrain(initialState, buildTileList())
         addPlayers(initialState)
+        startingColor = input("Who is going first? ({}): ".format(initialState.players.keys()))
+        startingPlayer = ColorFromString(startingColor.strip())
+        initialState.currentplayer = startingPlayer
         return initialState
 
     def current_player(self, state):

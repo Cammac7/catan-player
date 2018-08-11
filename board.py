@@ -91,6 +91,7 @@ class CatanBoard:
         self.players = OrderedDict()  # color:player
         self.deck = []  # stack of dev cards
         self.robberLocation = (5, 8)  # The start location of the robber is the center desert tile.
+        self.currentplayer = None
 
     def player(self, color):
         return self.players[color]

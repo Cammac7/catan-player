@@ -268,8 +268,8 @@ class Human(Player):
             self.playedCards.append(DevCard.KNIGHT)
             #TODO add robber moves
         elif dcard == "Road Building":
-            for n in range(3):
-                print("Segment {}/3".format(n+1))
+            for n in range(2):
+                print("Segment {}/2".format(n+1))
                 fromL = inValLoc("From which location? (x,y): ")
                 toL = inValLoc("To which location? (x,y): ")
                 self.board.buildRoad(self.color, fromL, toL)
@@ -332,4 +332,5 @@ class Computer(Player):
 
     def playTurn(self):
         # TODO: Need to implement
+        print("A.A.R.O.N. IS PASSING")
         pass

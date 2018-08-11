@@ -50,7 +50,7 @@ def payout(state, roll):
         owner.hand[node.returns[roll]] += node.structure
 
 def moveRobber(state, loc):
-    state.robberLocation = loc
+    state.robberTile = loc
 
 def buildSettle(state, color, location):
     selecNode = state.nodelist[location]

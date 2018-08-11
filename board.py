@@ -90,7 +90,7 @@ class CatanBoard:
         self.players = {}  # color:player
         self.playerorder = [] #list of colors in order of play
         self.deck = []  # stack of dev cards
-        self.robberLocation = (5, 8)  # The start location of the robber is the center desert tile.
+        self.robberTile = (5, 8)  # The starting tile of the robber is the center desert tile.
         self.currentplayer = None
 
     def player(self, color):

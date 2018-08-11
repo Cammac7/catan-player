@@ -186,7 +186,6 @@ a   anything
             break
         state.nodelist[l].port = p
 
-#TODO fix the self references in this
 def addPlayers(state):
     print('\n~~~ Players ~~~\n')
     s = input(
@@ -230,12 +229,8 @@ def initialPlacement(state):
                     print("Invalid road location.")
                     continue
                 break
-            #self.board.buildSettle(self.color, setLoc)
-            selecNode = state.nodelist[location]
-            selecNode.owner = p
-            selecNode.structure = 1
-            state.players[p].victoryPoints += 1
-            #self.board.buildRoad(self.color, setLoc, setRd)   
+            buildSettle(state, p, setLoc)
+            buildRoad(state, p, setLoc, setRd)   
         
 def p(state, s):
     x = s[0]

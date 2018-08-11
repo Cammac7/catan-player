@@ -84,30 +84,6 @@ def inResource(prompt):
         break
     return (n, r)
 
-class Player:
-    def __init__(self, color):
-        self.hand = Counter({Resource.BRICK:4, Resource.LUMBER:4, Resource.WOOL:2, Resource.GRAIN:2})
-        self.unplayedCards = 0  # unplayed development cards. Should be dict of Card:probability that they have it
-        self.playedCards = []
-        self.color = color  # player color #TODO change this to ColorFromString(color) [will be repurcussions]
-        self.victoryPoints = 0  # maybe can contain decimals to represent probability
-        self.longestRoad = False
-        self.largestArmy = False
-        self.remaining = Counter()  # remaining roads, settlements and cities
-
-    def updateVPs(self):  # do I need this function? could update for each action
-        newVP = 0
-        for node in self.nodes.values():
-            newVP += node.structure
-        for card in self.playedCards:
-            if card == 'VP':
-                newVP += 1
-        if self.longestRoad:
-            newVP += 2
-        if self.largestArmy:
-            newVP += 2
-        self.victoryPoints = newVP
-
 def inValLoc(prompt):
     p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
     while True:

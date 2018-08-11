@@ -186,6 +186,7 @@ a   anything
             break
         state.nodelist[l].port = p
 
+#TODO fix the self references in this
 def addPlayers(state):
     print('\n~~~ Players ~~~\n')
     s = input(

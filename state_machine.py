@@ -1,4 +1,5 @@
 from board import * CatanBoard
+from player import *
 
 class StateMachine():
     def start(self): # Returns a representation of the starting state of the game.
@@ -7,13 +8,10 @@ class StateMachine():
         addPlayers(initialState)
         initialPlacement(initialState)
         initialState.currentplayer = startingPlayer
-        
         return initialState
 
     def current_player(self, state):
-        # Takes the game state and returns the current player's
-        # number.
-        pass
+        return state.currentplayer
 
     def next_state(self, state, play):
         # Takes the game state, and the move to be applied.
@@ -181,7 +179,7 @@ a   anything
             r = input('What resource? ')
             p = PortFromString(r)
             if p is None:
-                print("Invalid resource: '{0}'".format(r))
+                print("Invalid resource: {0}".format(r))
                 continue
             break
         state.nodelist[l].port = p
@@ -200,6 +198,7 @@ def addPlayers(state):
     state.playerorder.append(c)
     state.players[c] = Computer(c, self) 
     
+#TODO: If it's our turn
 def initialPlacement(state):
     print('\n~~~ Inital placement ~~~\n')
     s = input("Who is going first? ({}): ".format(state.players.keys()))
@@ -207,8 +206,8 @@ def initialPlacement(state):
     rotate = len(state.playerorder) - state.playerorder.index(c)
     state.playerorder = state.playerorder[-rotate:] + state.playerorder[:-rotate]
     for p in range((2 * len(state.playerorder))):
-        if ITS_OUR_TURN:
-            
+        if type(state.players[p]) is Computer:
+            pass
         else:
             printBoard(state)
             print("Current Turn: Player {}".format(p))

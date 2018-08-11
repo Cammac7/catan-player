@@ -15,7 +15,7 @@ _greeting = r"""
 
 
 def main():
-    print(_greeting)
+    print(_greeting)        
     myboard = CatanBoard()
     myboard.play()
     # tileList given left->right top->bottom

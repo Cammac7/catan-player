@@ -4,11 +4,10 @@ class StateMachine():
     def start(self): # Returns a representation of the starting state of the game.
         initialState = CatanBoard()
         setTerrain(initialState, buildTileList())
-        addPorts(initialState)
         addPlayers(initialState)
-        startingColor = input("Who is going first? ({}): ".format(initialState.players.keys()))
-        pColor = ColorFromString(startingColor.strip())
-        initialState.currentplayer = pColor
+        initialPlacement(initialState)
+        initialState.currentplayer = startingPlayer
+        
         return initialState
 
     def current_player(self, state):
@@ -34,32 +33,47 @@ class StateMachine():
         # the game is tied, return a different distinct value, e.g. -1.
         pass
 
+#Actions
+def payout(state, roll):
+    robbedLocs = NodeLocationsForTile(state.robberTile)
+    payingLocs = [loc for loc in state.nodelist if loc not in robbedLocs and roll in state.nodelist[loc].returns and state.nodelist[loc].owner != None]
+    if len(payingLocs) == 0:
+        print("No Payout")
+        return
+    print("\nPAYOUTS")
+    print("Node\tOwner\tPayout")
+    payingNodes = [state.nodelist[loc] for loc in payingLocs]
+    for l in payingLocs:
+        node = state.nodelist[l]
+        print("{}\t{}\t{} {}".format(l,node.owner,node.structure,node.returns[roll]))
+        owner = state.players[node.owner]
+        owner.hand[node.returns[roll]] += node.structure
+
+def moveRobber(state, loc):
+    state.robberLocation = loc
+
+def buildSettle(state, color, location):
+    selecNode = state.nodelist[location]
+    selecNode.owner = color
+    selecNode.structure = 1
+    player = state.players[color]
+    player.victoryPoints += 1  # this is faster than running the function
+
+def buildCity(state, location):
+    selecNode = state.nodelist[location]
+    selecNode.structure = 2
+    pColor = selecNode.owner
+    player = state.players[pColor]
+    player.victoryPoints += 1
+
+def buildRoad(state, color, fromLoc, toLoc):
+    fromNode = state.nodelist[fromLoc]
+    toNode = state.nodelist[toLoc]
+    fromNode.neighbors[toNode] = color
+    toNode.neighbors[fromNode] = color
 
     
-@unique
-class Color(Enum):
-    RED = 1
-    BLUE = 2
-    ORANGE = 3
-    WHITE = 4
-    BLACK = 5
-    GREEN = 6
     
-    def __str__(self):
-        return self.name.lower()
-
-def ColorFromString(s):
-    if not s:
-        return None
-    s = s.upper()
-    for r in Color:
-        # We accept the full name with any capitalization (e.g. 'red', 'RED',
-        # 'ReD', etc.).
-        if r.name == s:
-            return r
-    return None    
-    
-
 #Set Terrain, given a tile list.
 def setTerrain(state, tileList):
     for index, item in enumerate(tileList):
@@ -171,7 +185,7 @@ a   anything
                 continue
             break
         state.nodelist[l].port = p
-        
+
 def addPlayers(state):
     print('\n~~~ Players ~~~\n')
     s = input(
@@ -180,20 +194,47 @@ def addPlayers(state):
     colors = [ColorFromString(c.strip()) for c in s.split(",")]
     for c in colors:
         state.players[c] = Human(c, self)
+        state.playerorder.append(c)
     s = input("Which color am I playing as? ")
     c = ColorFromString(s.strip())
-    state.players[c] = Computer(c, self)
+    state.playerorder.append(c)
+    state.players[c] = Computer(c, self) 
     
 def initialPlacement(state):
     print('\n~~~ Inital placement ~~~\n')
-    s = input("Who is first? ")
+    s = input("Who is going first? ({}): ".format(state.players.keys()))
     c = ColorFromString(s.strip())
-    iFirst = list(state.players.keys()).index(c)
-    for i in range(iFirst, iFirst + ((2 * len(state.players)))):
-        printBoard(state)
-        p = list(self.players.values())[i % len(state.players)]
-        print("Current Turn: Player {}".format(p.color))
-        p.initPlace()
+    rotate = len(state.playerorder) - state.playerorder.index(c)
+    state.playerorder = state.playerorder[-rotate:] + state.playerorder[:-rotate]
+    for p in range((2 * len(state.playerorder))):
+        if ITS_OUR_TURN:
+            
+        else:
+            printBoard(state)
+            print("Current Turn: Player {}".format(p))
+            openNodes = [key for key in state.nodelist if state.nodelist[key].owner == None]
+            validSetts = [loc for loc in openNodes if len([n for n in state.nodelist[loc].neighbors if n.owner!=None])==0]
+            while True:
+            setLoc = inValLoc("Location of placed settlement: ")
+            if setLoc not in validSetts:
+                print("Invalid settlement location.")
+                continue
+            break
+            neighbors = list(state.nodelist[setLoc].neighbors.keys())
+            possRoads = [loc for loc in state.nodelist if state.nodelist[loc] in neighbors]
+            print("Possible road directions: {}".format(possRoads))
+            while True:
+                setRd = inValLoc("Location of road end: ")
+                if setRd not in possRoads:
+                    print("Invalid road location.")
+                    continue
+                break
+            #self.board.buildSettle(self.color, setLoc)
+            selecNode = state.nodelist[location]
+            selecNode.owner = p
+            selecNode.structure = 1
+            state.players[p].victoryPoints += 1
+            #self.board.buildRoad(self.color, setLoc, setRd)   
         
 def p(state, s):
     x = s[0]

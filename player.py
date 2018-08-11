@@ -40,6 +40,29 @@ class DevCard(Enum):
         return self.name.lower()
 
 
+@unique
+class Color(Enum):
+    RED = 1
+    BLUE = 2
+    ORANGE = 3
+    WHITE = 4
+    BLACK = 5
+    GREEN = 6
+    
+    def __str__(self):
+        return self.name.lower()
+
+def ColorFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Color:
+        # We accept the full name with any capitalization (e.g. 'red', 'RED',
+        # 'ReD', etc.).
+        if r.name == s:
+            return r
+    return None
+
 def inResource(prompt):
     p = re.compile(r'(\d+)\s*(\w+)')
     #TODO I think we should allow this to take JUST a resource (i.e. assume number is zero if none given)
@@ -133,26 +156,6 @@ class Player:
 class Human(Player):
     def __init__(self, color, board):
         Player.__init__(self, color, board)
-
-    def initPlace(self):
-        validSetts = self.board.validInitSetPlace()
-        while True:
-            setLoc = inValLoc("Location of placed settlement: ")
-            if setLoc not in validSetts:
-                print("Invalid settlement location.")
-                continue
-            break
-        neighbors = list(self.board.nodelist[setLoc].neighbors.keys())
-        possRoads = [loc for loc in self.board.nodelist if self.board.nodelist[loc] in neighbors]
-        print("Possible road directions: {}".format(possRoads))
-        while True:
-            setRd = inValLoc("Location of road end: ")
-            if setRd not in possRoads:
-                print("Invalid road location.")
-                continue
-            break
-        self.board.buildSettle(self.color, setLoc)
-        self.board.buildRoad(self.color, setLoc, setRd)
         
     def roll(self):
         roll = inValRoll("What did they roll?: ")

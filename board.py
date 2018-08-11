@@ -2,7 +2,6 @@
 
 import re
 from enum import Enum, unique
-from collections import OrderedDict
 from player import *
 
 @unique
@@ -88,7 +87,8 @@ class CatanBoard:
     def __init__(self):
         self.nodelist = {}  # location:node. 54 total nodes
         self.edgelist = {}  # edgename:color ?? or color:[(locA,locB)]
-        self.players = OrderedDict()  # color:player
+        self.players = {}  # color:player
+        self.playerorder = [] #list of colors in order of play
         self.deck = []  # stack of dev cards
         self.robberLocation = (5, 8)  # The start location of the robber is the center desert tile.
         self.currentplayer = None
@@ -109,46 +109,4 @@ class CatanBoard:
             p.playTurn()
             playerIndex += 1
 
-    def payout(self, roll):
-        robbedLocs = NodeLocationsForTile(self.robberTile)
-        payingLocs = [loc for loc in self.nodelist if loc not in robbedLocs and roll in self.nodelist[loc].returns and self.nodelist[loc].owner != None]
-        if len(payingLocs) == 0:
-            print("No Payout")
-            return
-        print("\nPAYOUTS")
-        print("Node\tOwner\tPayout")
-        payingNodes = [self.nodelist[loc] for loc in payingLocs]
-        for l in payingLocs:
-            node = self.nodelist[l]
-            print("{}\t{}\t{} {}".format(l,node.owner,node.structure,node.returns[roll]))
-            owner = self.players[node.owner]
-            owner.hand[node.returns[roll]] += node.structure
-
-    def moveRobber(self, loc):
-        self.robberLocation = loc
-
-    def buildSettle(self, color, location):
-        selecNode = self.nodelist[location]
-        selecNode.owner = color
-        selecNode.structure = 1
-        player = self.players[color]
-        player.victoryPoints += 1  # this is faster than running the function
-
-    def buildCity(self, location):
-        selecNode = self.nodelist[location]
-        selecNode.structure = 2
-        pColor = selecNode.owner
-        player = self.players[pColor]
-        player.victoryPoints += 1
-        
-    def buildRoad(self, color, fromLoc, toLoc):
-        fromNode = self.nodelist[fromLoc]
-        toNode = self.nodelist[toLoc]
-        fromNode.neighbors[toNode] = color
-        toNode.neighbors[fromNode] = color
-
-    def validInitSetPlace(self):
-        openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
-        realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]
-        return realOptions
 

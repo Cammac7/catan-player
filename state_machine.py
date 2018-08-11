@@ -4,10 +4,11 @@ class StateMachine():
     def start(self): # Returns a representation of the starting state of the game.
         initialState = CatanBoard()
         setTerrain(initialState, buildTileList())
+        addPorts(initialState)
         addPlayers(initialState)
         startingColor = input("Who is going first? ({}): ".format(initialState.players.keys()))
-        startingPlayer = ColorFromString(startingColor.strip())
-        initialState.currentplayer = startingPlayer
+        pColor = ColorFromString(startingColor.strip())
+        initialState.currentplayer = pColor
         return initialState
 
     def current_player(self, state):
@@ -33,7 +34,32 @@ class StateMachine():
         # the game is tied, return a different distinct value, e.g. -1.
         pass
 
+
     
+@unique
+class Color(Enum):
+    RED = 1
+    BLUE = 2
+    ORANGE = 3
+    WHITE = 4
+    BLACK = 5
+    GREEN = 6
+    
+    def __str__(self):
+        return self.name.lower()
+
+def ColorFromString(s):
+    if not s:
+        return None
+    s = s.upper()
+    for r in Color:
+        # We accept the full name with any capitalization (e.g. 'red', 'RED',
+        # 'ReD', etc.).
+        if r.name == s:
+            return r
+    return None    
+    
+
 #Set Terrain, given a tile list.
 def setTerrain(state, tileList):
     for index, item in enumerate(tileList):

@@ -40,29 +40,6 @@ class DevCard(Enum):
         return self.name.lower()
 
 
-@unique
-class Color(Enum):
-    RED = 1
-    BLUE = 2
-    ORANGE = 3
-    WHITE = 4
-    BLACK = 5
-    GREEN = 6
-    
-    def __str__(self):
-        return self.name.lower()
-
-def ColorFromString(s):
-    if not s:
-        return None
-    s = s.upper()
-    for r in Color:
-        # We accept the full name with any capitalization (e.g. 'red', 'RED',
-        # 'ReD', etc.).
-        if r.name == s:
-            return r
-    return None
-
 def inResource(prompt):
     p = re.compile(r'(\d+)\s*(\w+)')
     #TODO I think we should allow this to take JUST a resource (i.e. assume number is zero if none given)

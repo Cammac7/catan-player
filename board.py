@@ -67,7 +67,21 @@ class Node:
         self.port = None  # port type or None
         self.returns = {}  # dict of num:resource, or probability of resource
         self.neighbors = {}  # {neighborNode:edgeColor}
-        #TODO add "isRobbered" boolean property
+
+# TILE_LOCATIONS lists tiles left->right and top->bottom.
+# These tupes are x/y coordinates of tile centers.
+TILE_LOCATIONS = [
+    (3, 14), (5, 14), (7, 14),
+    (2, 11), (4, 11), (6, 11), (8, 11),
+    (1, 8), (3, 8), (5, 8), (7, 8), (9, 8),
+    (2, 5), (4, 5), (6, 5), (8, 5),
+    (3, 2), (5, 2), (7, 2)
+]
+
+def NodeLocationsForTile(tile):
+    x = tile[0]
+    y = tile[1]
+    return [(x - 1, y + 1), (x, y + 2), (x + 1, y + 1), (x - 1, y - 1), (x, y - 2), (x + 1, y - 1)]
 
 
 class CatanBoard:
@@ -77,6 +91,7 @@ class CatanBoard:
         self.players = OrderedDict()  # color:player
         self.deck = []  # stack of dev cards
         self.winner = False
+        self.robberLocation = (5, 8)  # The start location of the robber is the center desert tile.
 
     def player(self, color):
         return self.players[color]
@@ -99,6 +114,7 @@ class CatanBoard:
         c = ColorFromString(s.strip())
         iFirst = list(self.players.keys()).index(c)
         for i in range(iFirst, iFirst + ((2 * len(self.players)))):
+            self.printBoard()
             p = list(self.players.values())[i % len(self.players)]
             print("Current Turn: Player {}".format(p.color))
             p.initPlace()
@@ -215,19 +231,22 @@ letters in the following map:
             self.addPort(l, p)
 
     def payout(self, roll):
-        #TODO account for Robber
-        payingLocs = [loc for loc in self.nodelist if roll in self.nodelist[loc].returns and self.nodelist[loc].owner != None]
-        if len(payingLocs) > 0:
-            print("\nPAYOUTS")
-            print("Node\tOwner\tPayout")
-            payingNodes = [self.nodelist[loc] for loc in payingLocs]
-            for l in payingLocs:
-                node = self.nodelist[l]
-                print("{}\t{}\t{} {}".format(l,node.owner,node.structure,node.returns[roll]))
-                owner = self.players[node.owner]
-                owner.hand[node.returns[roll]] += node.structure
-        else:
+        robbedLocs = NodeLocationsForTile(self.robberTile)
+        payingLocs = [loc for loc in self.nodelist if loc not in robbedLocs and roll in self.nodelist[loc].returns and self.nodelist[loc].owner != None]
+        if len(payingLocs) == 0:
             print("No Payout")
+            return
+        print("\nPAYOUTS")
+        print("Node\tOwner\tPayout")
+        payingNodes = [self.nodelist[loc] for loc in payingLocs]
+        for l in payingLocs:
+            node = self.nodelist[l]
+            print("{}\t{}\t{} {}".format(l,node.owner,node.structure,node.returns[roll]))
+            owner = self.players[node.owner]
+            owner.hand[node.returns[roll]] += node.structure
+
+    def moveRobber(self, loc):
+        self.robberLocation = loc
 
     def addNode(self, location):
         self.nodelist[location] = Node()
@@ -255,24 +274,12 @@ letters in the following map:
     def validInitSetPlace(self):
         openNodes = [key for key in self.nodelist if self.nodelist[key].owner == None]
         realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]
-        self.printBoard()
         return realOptions
 
     def setTerrain(self, tileList):
-        # list tiles left->right and top->bottom
-        # These tupes are x/y coordinates of tile centers
-        tileLocs = [(3, 14), (5, 14), (7, 14),
-                    (2, 11), (4, 11), (6, 11), (8, 11),
-                    (1, 8), (3, 8), (5, 8), (7, 8), (9, 8),
-                    (2, 5), (4, 5), (6, 5), (8, 5),
-                    (3, 2), (5, 2), (7, 2)]
         for index, item in enumerate(tileList):
-            tl = tileLocs[index]
-            x = tl[0]
-            y = tl[1]
-            nodeLocs = [(x - 1, y + 1), (x, y + 2), (x + 1, y + 1),
-                        (x - 1, y - 1), (x, y - 2), (x + 1, y - 1)]
-            for loc in nodeLocs:
+            tile = TILE_LOCATIONS[index]
+            for loc in NodeLocationsForTile(tile):
                 if loc not in self.nodelist:
                     self.addNode(loc)
                 self.nodelist[loc].returns[item[1]] = item[0]

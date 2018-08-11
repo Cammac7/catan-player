@@ -5,8 +5,6 @@ from collections import Counter
 import re
 import random
 
-#TODO need to implement robber 
-
 @unique
 class Resource(Enum):
     DESERT = 0
@@ -81,8 +79,7 @@ def inResource(prompt):
         if r is None or r == Resource.DESERT:
             print("Invalid resource: '{}'".format(match.group(2)))
             continue
-        break
-    return (n, r)
+        return (n, r)
 
 def inValLoc(prompt):
     p = re.compile(r"(\d\d?)\s*,\s*(\d\d?)")
@@ -100,28 +97,35 @@ def inValLoc(prompt):
         if y < 0 or y > 16:
             print("Invalid y coordinate. y must be in the range [0, 16].")
             continue
-        break
-    return (x, y)
+        return (x, y)
 
-def inValRoll(inroll):
+def inValRoll(prompt):
     while True:
-        roll = int(input(inroll))
-        if roll not in [2,3,4,5,6,7,8,9,10,11,12]:
-            print("Sorry, not a valid dice roll")
+        s = input(prompt).strip()
+        # TODO: Don't crash if we can't cast the roll to an int.
+        roll = int(s)
+        if roll < 2 or roll > 12:
+            print("Invalid dice roll. Must be in the range [2, 12].")
             continue
-        else:
-            break
-    return roll
+        return roll
 
 def inAction(prompt):
     while True:
-        uprompt = input(prompt)
-        if uprompt not in ["build", "trade", "ask", "devcard", "end"]:
-            print("You can only build, trade, ask, play a devcard, or end")
+        s = input(prompt).strip().lower()
+        if s not in ["build", "trade", "devcard", "end"]:
+            print("Invalid action. You can only build, trade, play a devcard, or end.")
             continue
-        else:
-            break
-    return uprompt
+        # TODO: Return an enum.
+        return s
+
+def inPlayerColor(prompt, validColors):
+    while True:
+        s = input(prompt).strip()
+        c = ColorFromString(s)
+        if c is None or c not in validColors:
+            print("Invalid color.")
+            continue
+        return c
 
 
 class Player:
@@ -154,17 +158,40 @@ class Human(Player):
 
     def initPlace(self):
         validSetts = self.board.validInitSetPlace()
-        setLoc = inValLoc("Location of Placed Settlement: ")
-        while setLoc not in validSetts:
-            setLoc = inValLoc("Location of Placed Settlement: ")
+        while True:
+            setLoc = inValLoc("Location of placed settlement: ")
+            if setLoc not in validSetts:
+                print("Invalid settlement location.")
+                continue
+            break
         neighbors = list(self.board.nodelist[setLoc].neighbors.keys())
         possRoads = [loc for loc in self.board.nodelist if self.board.nodelist[loc] in neighbors]
-        print("Possible Road Directions: {}".format(possRoads))
-        setRd = inValLoc("Location of road end: ")
-        while setRd not in possRoads:
+        print("Possible road directions: {}".format(possRoads))
+        while True:
             setRd = inValLoc("Location of road end: ")
+            if setRd not in possRoads:
+                print("Invalid road location.")
+                continue
+            break
         self.board.buildSettle(self.color, setLoc)
         self.board.buildRoad(self.color, setLoc, setRd)
+        
+    def roll(self):
+        roll = inValRoll("What did they roll?: ")
+        if roll != 7:
+            self.board.payout(roll)
+            return
+        # Robber time
+        # TODO: Every player's hand that is > 7 cards loses half their hand, rounded down.
+        self.moveRobber()
+        
+    def moveRobber(self):
+        loc = inValLoc("Where are you moving the robber? (x,y): ")
+        self.board.moveRobber(loc)
+        c = inPlayerColor("Which player is being stolen from?: ", self.board.players)
+        _, r = inResource("What resource was taken?: ") # TODO: This should actually be secret/unknown to the AI
+        self.board.players[c].hand.subtract({r:1})
+        self.hand += {r:1}
 
     def build(self):
         while True:
@@ -198,19 +225,10 @@ class Human(Player):
     def trade(self):
         p = re.compile(r'(\d+)\s*(\w+)')
         maritime = False
-        while True:
-            s = input("Who is {} trading with (enter 'maritime' for maritime trades)?: ".format(self.color)).strip()
-            if s.lower() == "maritime":
-                maritime = True
-                break
-            c = ColorFromString(s)
-            if c is None or c not in self.board.players:
-                print("Invalid color.")
-                continue
-            break
-        if maritime:
+        s = input("Is this a maritime trade (i.e. a trade with the bank)? (y/n): ").strip().lower()
+        if s == "y":
             port = False
-            s = input('Is the trade at a port? i.e 3:1. (y/n) ').lower()
+            s = input("Is the trade at a port (i.e. 3:1)? (y/n): ").lower()
             giving = ResourceFromString(input("What is {} trading? (b/g/l/o/w): ".format(self.color)))
             getting = ResourceFromString(input("What is {} receiving? (b/g/l/o/w): ".format(self.color)))
             if s == "y":
@@ -220,6 +238,7 @@ class Human(Player):
                 self.hand.subtract({giving:4})
                 self.hand += {getting:1}
         else:
+            c = inPlayerColor("Which player is {} trading with?: ".format(self.color), self.board.players)
             nSelf, rSelf = inResource("What is {} trading?: ".format(self.color))
             nThem, rThem = inResource("What is {} trading?: ".format(c.name.lower()))
             otherPlayer = self.board.players[c]
@@ -229,7 +248,6 @@ class Human(Player):
             self.hand += getting
             otherPlayer.hand.subtract(getting)
             otherPlayer.hand += giving
-            # TODO
 
     def playDevcard(self):
         while True:
@@ -242,7 +260,7 @@ class Human(Player):
         if dcard == "Knight":
             self.unplayedCards -= 1
             self.playedCards.append(DevCard.KNIGHT)
-            #TODO add robber moves
+            self.moveRobber()
         elif dcard == "Road Building":
             for n in range(2):
                 print("Segment {}/2".format(n+1))
@@ -272,11 +290,13 @@ class Human(Player):
         #TODO "We should make these Enums" - Mark Langer probably
 
     def playTurn(self):
+        # TODO: Announcing whose turn it is and rolling should be part of they
+        # base Player class, since that has to happen for any player, human or not.
         print("")
         print("Current Turn: {}".format(self.color))
-        roll = inValRoll("What did they roll?: ")
-        self.board.payout(roll)
-        action = inAction("What Action? (build, trade, devcard, end): ")
+        self.roll()
+        actionPrompt = "What Action? (build, trade, devcard, end): "
+        action = inAction(actionPrompt)
         while action != "end":
             if action == "build":
                 self.build()
@@ -285,7 +305,7 @@ class Human(Player):
             elif action == "devcard":
                 self.playDevcard()
             #TODO add check board state for longest road/largest army. (and winner?)
-            action = inAction("What Action? (build, trade, devcard, end): ")
+            action = inAction(actionPrompt)
         print("Ending Turn")
 
 

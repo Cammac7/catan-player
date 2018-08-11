@@ -1,4 +1,4 @@
-class StateMachine(object):
+class StateMachine():
     def start(self):
         # Returns a representation of the starting state of the game.
         pass

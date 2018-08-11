@@ -90,145 +90,23 @@ class CatanBoard:
         self.edgelist = {}  # edgename:color ?? or color:[(locA,locB)]
         self.players = OrderedDict()  # color:player
         self.deck = []  # stack of dev cards
-        self.winner = False
         self.robberLocation = (5, 8)  # The start location of the robber is the center desert tile.
 
     def player(self, color):
         return self.players[color]
 
     def play(self):
-        self.setTerrain(self.buildTileList())
-        self.addPorts()
-        self.addPlayers()
-        playerIndex = self.initialPlacement()
+        #self.setTerrain(self.buildTileList())
+        #self.addPorts()
+        #self.addPlayers()
+        #playerIndex = self.initialPlacement()
+        
         print('\n~~~ Start game ~~~\n')
         while not self.winner:
             self.printBoard()
             p = list(self.players.values())[playerIndex % len(self.players)]
             p.playTurn()
             playerIndex += 1
-
-    def initialPlacement(self):
-        print('\n~~~ Inital placement ~~~\n')
-        s = input("Who is first? ")
-        c = ColorFromString(s.strip())
-        iFirst = list(self.players.keys()).index(c)
-        for i in range(iFirst, iFirst + ((2 * len(self.players)))):
-            self.printBoard()
-            p = list(self.players.values())[i % len(self.players)]
-            print("Current Turn: Player {}".format(p.color))
-            p.initPlace()
-        return iFirst
-
-    def buildTileList(self):
-        print("""~~~ Tiles ~~~
-
-Input the resources of each of the tiles in order (left to right, then top to
-bottom). The input format is '<dice roll><resource>', where dice roll is a
-number 2-12 and resource is one of the letters in the following map:
-
-    b   brick
-    g   grain
-    l   lumber
-    o   ore
-    w   wool
-    d   desert
-
-For example, '10w' means the tile has a resource of wool and a dice roll of 10.
-Note: The roll is necessary for desert tiles but it will be ignored.
-Other valid inputs are:
-
-    build     Finish inputting tiles
-    undo      Undo the last inputted tile
-    default   Use a default tile configuration
-
-""")
-
-        p = re.compile(r'(\d\d?)\s*(\w+)')
-        tList = []
-        while True:
-            s = input('Next tile: ').strip()
-            if s == "build":
-                return tList
-            elif s == "undo":
-                tList.pop()
-            elif s == "default":
-                return [
-                    (Resource.ORE, 10), (Resource.WOOL, 2), (Resource.LUMBER, 9), (Resource.GRAIN, 12), (Resource.BRICK, 6),
-                    (Resource.WOOL, 4), (Resource.BRICK, 10), (Resource.GRAIN, 9), (Resource.LUMBER, 11), (Resource.DESERT, 0),
-                    (Resource.LUMBER, 3), (Resource.ORE, 8), (Resource.LUMBER, 8), (Resource.ORE, 3), (Resource.GRAIN, 4),
-                    (Resource.WOOL, 5), (Resource.BRICK, 5), (Resource.GRAIN, 6), (Resource.WOOL, 11)]
-            else:
-                match = p.match(s)
-                if not match:
-                    print("Invalid input: '{0}'".format(s))
-                    continue
-                resource = ResourceFromString(match.group(2))
-                if resource is None:
-                    print("Invalid resource: '{0}'".format(match.group(2)))
-                    continue
-                roll = 0
-                if resource != Resource.DESERT:
-                    roll = RollFromString(match.group(1))
-                    if roll is None:
-                        print("Invalid dice roll: '{0}'".format(match.group(1)))
-                        continue
-                tList.append((resource, roll))
-
-    def addPlayers(self):
-        print('\n~~~ Players ~~~\n')
-        s = input(
-            "Enter color of other players in clockwise order, starting to my left "
-            "(comma separated like 'red,white,orange'): ")
-        colors = [ColorFromString(c.strip()) for c in s.split(",")]
-        for c in colors:
-            self.players[c] = Human(c, self)
-        s = input("Which color am I playing as? ")
-        c = ColorFromString(s.strip())
-        self.players[c] = Computer(c, self)
-
-    def addPort(self, location, portType):
-        self.nodelist[location].port = portType
-
-    def addPorts(self):
-        print('\n~~~ Ports ~~~\n')
-        s = input('Use default ports? (y/n) ').lower()
-        if s == 'y':
-            for loc in [(2,1),(3,0),(5,0),(6,1),(10,7),(10,9),(2,15),(3,16)]:
-                self.addPort(loc, Port.ANYTHING)
-            self.addPort((8,3), Port.WOOL)
-            self.addPort((9,4), Port.WOOL)
-            self.addPort((1,4), Port.BRICK)
-            self.addPort((1,6), Port.BRICK)
-            self.addPort((1,10), Port.LUMBER)
-            self.addPort((1,12), Port.LUMBER)
-            self.addPort((9,12), Port.ORE)
-            self.addPort((8,13), Port.ORE)
-            self.addPort((5,16), Port.GRAIN)
-            self.addPort((6,15), Port.GRAIN)
-            return
-        print("""
-Input the ports in order of clockwise order starting with the top left port. The
-format of the location is "x,y". The format for the resource is is one of the
-letters in the following map:
-
-    b   brick
-    g   grain
-    l   lumber
-    o   ore
-    w   wool
-    a   anything
-""")
-        for i in range(18):
-            l = inValLoc('Location of port? ')
-            while True:
-                r = input('What resource? ')
-                p = PortFromString(r)
-                if p is None:
-                    print("Invalid resource: '{0}'".format(r))
-                    continue
-                break
-            self.addPort(l, p)
 
     def payout(self, roll):
         robbedLocs = NodeLocationsForTile(self.robberTile)
@@ -247,9 +125,6 @@ letters in the following map:
 
     def moveRobber(self, loc):
         self.robberLocation = loc
-
-    def addNode(self, location):
-        self.nodelist[location] = Node()
 
     def buildSettle(self, color, location):
         selecNode = self.nodelist[location]
@@ -276,59 +151,3 @@ letters in the following map:
         realOptions = [loc for loc in openNodes if len([n for n in self.nodelist[loc].neighbors if n.owner!=None])==0]
         return realOptions
 
-    def setTerrain(self, tileList):
-        for index, item in enumerate(tileList):
-            tile = TILE_LOCATIONS[index]
-            for loc in NodeLocationsForTile(tile):
-                if loc not in self.nodelist:
-                    self.addNode(loc)
-                self.nodelist[loc].returns[item[1]] = item[0]
-        for loc in self.nodelist:
-            for adj in [
-                    (loc[0] + 1, loc[1] - 1), (loc[0], loc[1] - 2), (loc[0] - 1, loc[1] - 1),
-                    (loc[0] - 1, loc[1] + 1), (loc[0], loc[1] + 2), (loc[0] + 1, loc[1] + 1)]:
-                if adj in self.nodelist:
-                    # assign adjacent neighbors
-                    self.nodelist[loc].neighbors[self.nodelist[adj]] = None
-
-    def p(self, s):
-        x = s[0]
-        y = s[1]
-        node = self.nodelist[s]
-        if node.owner == None:
-            return "({:>2},{:>2})".format(x,y)
-        else:
-            ow = node.owner.name.lower()[:1]
-            if node.structure == 2:
-                ow = ow.upper()
-            return "(  {}  )".format(ow)
-
-    def printBoard(self):
-        print("""                        {}         {}         {}
-                       /       \       /       \       /       \ 
-                {}         {}         {}         {}
-                   |               |               |               |
-                   |               |               |               |
-                {}         {}         {}         {}
-               /       \       /       \       /       \       /       \ 
-        {}         {}         {}         {}         {}
-           |               |               |               |               |
-           |               |               |               |               |
-        {}         {}         {}         {}         {}
-       /       \       /       \       /       \       /       \       /       \ 
-{}         {}         {}         {}         {}         {}
-  |                |               |               |               |               |
-  |                |               |               |               |               |
-{}         {}         {}         {}         {}         {}
-       \       /       \       /       \       /       \       /       \       /
-        {}         {}         {}         {}         {}
-           |               |               |               |               |
-           |               |               |               |               |
-        {}         {}         {}         {}         {}
-               \       /       \       /       \       /       \       /
-                {}         {}         {}         {}
-                   |               |               |               |
-                   |               |               |               |
-                {}         {}         {}         {}
-                       \       /       \       /       \       /
-                        {}         {}         {}""".format(self.p((3,16)), self.p((5,16)), self.p((7,16)), self.p((2,15)), self.p((4,15)), self.p((6,15)), self.p((8,15)), self.p((2,13)), self.p((4,13)), self.p((6,13)), self.p((8,13)), self.p((1,12)), self.p((3,12)), self.p((5,12)), self.p((7,12)), self.p((9,12)), self.p((1,10)), self.p((3,10)), self.p((5,10)), self.p((7,10)), self.p((9,10)), self.p((0,9)), self.p((2,9)), self.p((4,9)), self.p((6,9)), self.p((8,9)), self.p((10,9)), self.p((0,7)), self.p((2,7)), self.p((4,7)), self.p((6,7)), self.p((8,7)), self.p((10,7)), self.p((1,6)), self.p((3,6)), self.p((5,6)), self.p((7,6)), self.p((9,6)), self.p((1,4)), self.p((3,4)), self.p((5,4)), self.p((7,4)), self.p((9,4)), self.p((2,3)), self.p((4,3)), self.p((6,3)), self.p((8,3)), self.p((2,1)), self.p((4,1)), self.p((6,1)), self.p((8,1)), self.p((3,0)), self.p((5,0)), self.p((7,0))))

@@ -52,7 +52,7 @@ class Computer(Player):
             winner = self.board.winner(states_copy)
             if winner:
                 break
-        pass 
+        pass
 
     def playTurn(self):
         #Calculate the best move from the current game state and return it

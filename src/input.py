@@ -214,7 +214,7 @@ def playDevcard(self):
             if player != self:
                 amount = player.hand[resource]
                 self.hand += {resource:amount}
-                player.hand[resource] = 0   
+                player.hand[resource] = 0
     #TODO "We should make these Enums" - Mark Langer probably
 
 def playTurn(self):

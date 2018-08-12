@@ -18,7 +18,7 @@ class DevCard(Enum):
     ROAD_BUILDING = 2
     YEAR_OF_PLENTY = 3
     MONOPOLY = 4
-    
+
     def __str__(self):
         return self.name.lower()
 
@@ -30,7 +30,7 @@ class Color(Enum):
     WHITE = 4
     BLACK = 5
     GREEN = 6
-    
+
     def __str__(self):
         return self.name.lower()
 
@@ -53,7 +53,7 @@ class Port(Enum):
     LUMBER = 3
     ORE = 4
     WOOL = 5
-    
+
     def __str__(self):
         return self.name.lower()
 

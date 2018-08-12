@@ -27,16 +27,16 @@ def NodeLocationsForTile(tile):
 #         self.deck = []  # stack of dev cards
 #         self.robberTile = (5, 8)  # The starting tile of the robber is the center desert tile.
 #         self.currentplayer = None
-# 
+#
 #     def player(self, color):
 #         return self.players[color]
-# 
+#
 #     def play(self):
 #         #self.setTerrain(self.buildTileList())
 #         #self.addPorts()
 #         #self.addPlayers()
 #         #playerIndex = self.initialPlacement()
-# 
+#
 #         print('\n~~~ Start game ~~~\n')
 #         while not self.winner:
 #             self.printBoard()

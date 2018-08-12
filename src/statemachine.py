@@ -70,8 +70,8 @@ def buildRoad(state, color, fromLoc, toLoc):
     fromNode.neighbors[toNode] = color
     toNode.neighbors[fromNode] = color
 
-    
-    
+
+
 #Set Terrain, given a tile list.
 def setTerrain(state, tileList):
     for index, item in enumerate(tileList):
@@ -87,7 +87,7 @@ def setTerrain(state, tileList):
             if adj in state.nodelist:
                 # assign adjacent neighbors
                 state.nodelist[loc].neighbors[state.nodelist[adj]] = None
-    
+
 # Build tile list. Should this be inside a class?
 def buildTileList():
     print("""~~~ Tiles ~~~
@@ -143,7 +143,7 @@ default   Use a default tile configuration
                     print("Invalid dice roll: '{0}'".format(match.group(1)))
                     continue
             tList.append((resource, roll))
-        
+
 def addPorts(state):
     print('\n~~~ Ports ~~~\n')
     s = input('Use default ports? (y/n) ').lower()
@@ -196,8 +196,8 @@ def addPlayers(state):
     s = input("Which color am I playing as? ")
     c = ColorFromString(s.strip())
     state.playerorder.append(c)
-    state.players[c] = Computer(c, self) 
-    
+    state.players[c] = Computer(c, self)
+
 #TODO: If it's our turn
 def initialPlacement(state):
     print('\n~~~ Inital placement ~~~\n')
@@ -229,8 +229,8 @@ def initialPlacement(state):
                     continue
                 break
             buildSettle(state, p, setLoc)
-            buildRoad(state, p, setLoc, setRd)   
-        
+            buildRoad(state, p, setLoc, setRd)
+
 def p(state, s):
     x = s[0]
     y = s[1]
@@ -242,20 +242,20 @@ def p(state, s):
         if node.structure == 2:
             ow = ow.upper()
         return "(  {}  )".format(ow)
-        
+
 def printBoard(state):
-    print("""                        {}         {}         {}
-                   /       \       /       \       /       \ 
+    print(r"""                        {}         {}         {}
+                   /       \       /       \       /       \
             {}         {}         {}         {}
                |               |               |               |
                |               |               |               |
             {}         {}         {}         {}
-           /       \       /       \       /       \       /       \ 
+           /       \       /       \       /       \       /       \
     {}         {}         {}         {}         {}
        |               |               |               |               |
        |               |               |               |               |
     {}         {}         {}         {}         {}
-   /       \       /       \       /       \       /       \       /       \ 
+   /       \       /       \       /       \       /       \       /       \
 {}         {}         {}         {}         {}         {}
 |                |               |               |               |               |
 |                |               |               |               |               |

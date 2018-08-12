@@ -10,7 +10,6 @@ import pygame
 from enum import Enum
 from pygame.locals import *
 
-DATA_DIR = 'data'
 HEX_RADIUS = 32
 BOARD = [
     [0, 0, 3, 0, 6, 0, 2, 0, 0],
@@ -45,20 +44,26 @@ def get_error():
     return SystemExit(str(pygame.compat.geterror()))
 
 
+def get_data_directory():
+    # The data directory is at ../data relative to this file, which is at
+    # src/gui_main.py
+    parent_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    return os.path.join(parent_dir, 'data')
+
+
 def get_image_name(terrain):
     return IMAGE_NAME.get(terrain, 'test_hex.png')
 
-# colorkey is the color to use for transparency.
-
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join(DATA_DIR, name)
+    fullname = os.path.join(get_data_directory(), name)
     try:
         image = pygame.image.load(fullname)
     except pygame.error:
         print('Cannot load image:', fullname)
         raise get_error()
     image = image.convert_alpha()
+    # colorkey is the color to use for transparency.
     if colorkey is not None:
         if colorkey is -1:
             colorkey = image.get_at((0, 0))
@@ -71,7 +76,7 @@ def load_sound(name):
         def play(self): pass
     if not pygame.mixer or not pygame.mixer.get_init():
         return NoneSound()
-    fullname = os.path.join(DATA_DIR, name)
+    fullname = os.path.join(get_data_directory(), name)
     try:
         sound = pygame.mixer.Sound(fullname)
     except pygame.error:
